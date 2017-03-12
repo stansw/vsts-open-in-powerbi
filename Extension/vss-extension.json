@@ -1,0 +1,101 @@
+{
+    "manifestVersion": 1,
+    "id": "vsts-open-work-items-in-powerbi",
+    "version": "0.0.46",
+    "name": "Open in Power BI",
+    "scopes": [
+        "vso.work"
+    ],
+    "description": "This extension opens Work Items and query results in Power BI Desktop",
+    "publisher": "stansw",
+    "icons": {
+        "default": "img/powerbi_logo_128x128.png"
+    },
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "tags": [
+        "Work Item",
+        "Power BI",
+        "Work",
+        "Agile",
+        "Query"
+    ],
+    "content": {
+        "details": {
+            "path": "details.md"
+        }
+    },
+    "links": {
+        "getstarted": {
+            "uri": "https://aka.ms/vsts-open-in-powerbi"
+        },
+        "learn": {
+            "uri": "https://aka.ms/vsts-open-in-powerbi"
+        },
+        "support": {
+            "uri": "https://github.com/stansw/vsts-open-in-powerbi"
+        }
+    },
+    "branding": {
+        "color": "rgb(242, 200, 17)",
+        "theme": "light"
+    },
+    "files": [
+        {
+            "path": "img",
+            "addressable": true
+        },
+        {
+            "path": "build",
+            "addressable": true
+        },
+        {
+            "path": "index.html",
+            "addressable": true
+        },
+        {
+            "path": "dialog.html",
+            "addressable": true
+        }
+    ],
+    "categories": [
+        "Plan and track"
+    ],
+    "contributions": [
+        {
+            "id": "openQueryAction",
+            "type": "ms.vss-web.action-provider",
+            "description": "Open in Power BI context menu on a query definition.",
+            "targets": [
+                "ms.vss-work-web.work-item-query-menu"
+            ],
+            "properties": {
+                "group": "contributed",
+                "uri": "index.html"
+            }
+        },
+        {
+            "id": "openQueryOnToolbarAction",
+            "type": "ms.vss-web.action-provider",
+            "description": "Open in Power BI toolbar menu item on the query results.",
+            "targets": [
+                "ms.vss-work-web.work-item-query-results-toolbar-menu"
+            ],
+            "properties": {
+                "group": "contributed",
+                "uri": "index.html"
+            }
+        },
+        {
+            "id": "notificationDialog",
+            "type": "ms.vss-web.control",
+            "targets": [],
+            "properties": {
+                "uri": "dialog.html"
+            }
+        }
+    ]
+}

@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <script src="build/VSS.SDK.min.js"></script>
+</head>
+
+<body>
+    <script type="text/javascript">
+        // Initialize framework 
+        VSS.init({
+            explicitNotifyLoaded: true,
+            usePlatformScripts: true,
+        });
+        
+        var Dialog;
+        // Load main entry point for extension
+        VSS.require(["build/dialog"], function (d) {
+            // Loading succeeded
+            VSS.notifyLoadSucceeded();
+            Dialog = d;
+        });
+    </script>
+    
+    <div id="content">
+        <div>Thanks for using <a href="javascript:Dialog.openUrl('https://aka.ms/vsts-open-in-powerbi')">Open Work Items in Power BI</a> extension.</div>
+        <div>For feedback and support please refer to the <a href="javascript:Dialog.openUrl('https://aka.ms/vsts-open-in-powerbi-handler')">project main page</a>.</div>
+
+        <div style="margin-top: 10px;">Your file will be available for download.</div>
+        <img style="margin-top: 10px;margin-bottom: 10px;" src="img/open_guide_350x467.png"/>
+
+        <div id="countdown-message">This dialog will close in <span id="countdown"></span> seconds... <a href="javascript:Dialog.cancelAutoClose()">cancel</a></div>
+    </div>
+
+</body>
+
+</html>
