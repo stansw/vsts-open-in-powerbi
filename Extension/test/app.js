@@ -28,23 +28,6 @@ define(["require", "exports"], function (require, exports) {
         return queryId && exports.queryExclusionList.indexOf(queryId.toUpperCase()) === -1;
     }
     exports.isSupportedQueryId = isSupportedQueryId;
-    function generateUrl(action, collection, project, qid, wids, columns) {
-        var url = "tfs://ExcelRequirements/" + action + "?cn=" + collection + "&proj=" + project;
-        if (action === SupportedActions.OpenQuery) {
-            if (!qid) {
-                throw new Error("'qid' must be provided for '" + SupportedActions.OpenQuery + "' action.");
-            }
-            url += "&qid=" + qid;
-        }
-        else {
-            throw new Error("Unsupported action provided: " + action);
-        }
-        if (url.length > 2000) {
-            throw new Error('Generated url is exceeds the maxlength, please reduce the number of work items you selected.');
-        }
-        return url;
-    }
-    exports.generateUrl = generateUrl;
     exports.openQueryAction = {
         getMenuItems: function (context) {
             if (!context || !context.query || !context.query.wiql || !isSupportedQueryId(context.query.id)) {
@@ -89,8 +72,14 @@ define(["require", "exports"], function (require, exports) {
                         }
                         else {
                             VSS.getService(VSS.ServiceIds.Dialog).then(function (hostDialogService) {
-                                hostDialogService.openMessageDialog("In order to open query please save it in \"My Queries\" or \"Shared Queries\".", {
-                                    title: "Unable to perform operation"
+                                hostDialogService.openMessageDialog("In order to open query please save it first in \"My Queries\" or \"Shared Queries\".", {
+                                    title: "Unable to perform this operation",
+                                    buttons: [
+                                        {
+                                            id: "ok",
+                                            text: "OK"
+                                        }
+                                    ]
                                 });
                             });
                         }

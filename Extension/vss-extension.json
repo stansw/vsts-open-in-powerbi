@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
-    "id": "vsts-open-work-items-in-powerbi",
-    "version": "0.0.46",
+    "id": "vsts-open-in-powerbi",
+    "version": "0.0.48",
     "name": "Open in Power BI",
     "scopes": [
         "vso.work"
@@ -30,13 +30,13 @@
     },
     "links": {
         "getstarted": {
-            "uri": "https://aka.ms/vsts-open-in-powerbi"
+            "uri": "https://github.com/stansw/vsts-open-in-powerbi"
         },
         "learn": {
-            "uri": "https://aka.ms/vsts-open-in-powerbi"
+            "uri": "https://github.com/stansw/vsts-open-in-powerbi/wiki"
         },
         "support": {
-            "uri": "https://github.com/stansw/vsts-open-in-powerbi"
+            "uri": "https://github.com/stansw/vsts-open-in-powerbi/wiki/Support"
         }
     },
     "branding": {
