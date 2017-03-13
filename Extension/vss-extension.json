@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "vsts-open-in-powerbi",
-    "version": "0.0.48",
+    "version": "0.1.0",
     "name": "Open in Power BI",
     "scopes": [
         "vso.work"

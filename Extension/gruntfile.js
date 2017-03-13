@@ -21,7 +21,7 @@
                 stderr: true
             },
             package_release: {
-                command: "tfx extension create --rev-version --manifests vss-extension.json --overrides-file configs/release.json --output-path visx/release",
+                command: "tfx extension create --manifests vss-extension.json --overrides-file configs/release.json --output-path visx/release",
                 stdout: true,
                 stderr: true
             },
