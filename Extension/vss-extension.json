@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "vsts-open-in-powerbi",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "name": "Open in Power BI",
     "scopes": [
         "vso.work"
@@ -13,7 +13,7 @@
     },
     "targets": [
         {
-            "id": "Microsoft.VisualStudio.Services"
+            "id": "Microsoft.VisualStudio.Services.Cloud"
         }
     ],
     "tags": [
@@ -29,15 +29,19 @@
         }
     },
     "links": {
-        "getstarted": {
-            "uri": "https://github.com/stansw/vsts-open-in-powerbi"
-        },
         "learn": {
             "uri": "https://github.com/stansw/vsts-open-in-powerbi/wiki"
+        },
+        "license":{
+            "uri": "https://github.com/stansw/vsts-open-in-powerbi/blob/master/LICENSE"
         },
         "support": {
             "uri": "https://github.com/stansw/vsts-open-in-powerbi/wiki/Support"
         }
+    },
+    "repository": {
+        "type": "git",
+        "uri": "https://github.com/stansw/vsts-open-in-powerbi"
     },
     "branding": {
         "color": "rgb(242, 200, 17)",
