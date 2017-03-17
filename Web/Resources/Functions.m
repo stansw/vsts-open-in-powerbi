@@ -164,7 +164,9 @@ let
                 else error Error.Record("Error", 
                     "Query was updated and does not return result of type ""Flat list of work items"". Please generate this file again."),
 
-            #"Get fields" = List.Transform(#"Check queryType"[columns], each [referenceName]),
+            #"Get fields" = List.Distinct(
+                { "System.Id", "System.Title", "System.WorkItemType" }
+                & List.Transform(#"Check queryType"[columns], each [referenceName])),
             #"Get ids" = List.Transform(Record.FieldOrDefault(#"Check queryType", "workItems", {}), each [id]),
             #"Get table" = GetWorkItemFieldValues(url, scope, #"Get ids", #"Get fields", options),
 
