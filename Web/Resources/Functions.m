@@ -1,5 +1,5 @@
 let
-    Version = "vsts-open-in-powerbi/1.0.0",
+    Version = "vsts-open-in-powerbi/1.0.1",
     
     BatchSize = 200,
     MaxFieldsCount = 100,
@@ -16,37 +16,40 @@ let
     ],
 
     Text.FromHtml = (value as nullable text) as nullable text =>
-        let
-            lines = if Web.Page <> null
-                then Text.FromHtmlRec(Web.Page(value){0}[Data])
-                else { value },
-            result = if value <> null
-                then Text.Combine(lines)
-                else null
-        in
-            result,
-
-    Text.FromHtmlRec = (nodesTable as table) as list =>
-        let
-            nodes = Table.ToRecords(nodesTable),
-            lines = List.TransformMany(nodes,
-                (n) =>
-                    let
-                        text = if n[Text]? <> null then { n[Text] } else {},
-                        children = if n[Children]? <> null then @Text.FromHtmlRec(n[Children]) else {},
-                        br = if n[Name]? = "P" or n[Name]? = "BR" 
-                            then { "#(lf)" }
-                            else if n[Name]? = "DIV"
-                                then if n[Children]? <> null and Table.RowCount(n[Children]) = 1 and n[Children]{0}[Name] = "BR"
-                                    then {}
-                                    else { "#(lf)" }
-                                else {},
-                        lines = List.Combine({ text, children, br })
-                    in
-                        lines,
-                (n, t) => t)
-        in
-            lines,
+        value,
+// This section is commented out because Web.Page function is not supported in Power BI Service
+// and it forces users to install Power BI Personal Gateway which is a significant effort.
+//        let
+//            lines = if Web.Page <> null
+//                then Text.FromHtmlRec(Web.Page(value){0}[Data])
+//                else { value },
+//            result = if value <> null
+//                then Text.Combine(lines)
+//                else null
+//        in
+//            result,
+//
+//    Text.FromHtmlRec = (nodesTable as table) as list =>
+//        let
+//            nodes = Table.ToRecords(nodesTable),
+//            lines = List.TransformMany(nodes,
+//                (n) =>
+//                    let
+//                        text = if n[Text]? <> null then { n[Text] } else {},
+//                        children = if n[Children]? <> null then @Text.FromHtmlRec(n[Children]) else {},
+//                        br = if n[Name]? = "P" or n[Name]? = "BR" 
+//                            then { "#(lf)" }
+//                            else if n[Name]? = "DIV"
+//                                then if n[Children]? <> null and Table.RowCount(n[Children]) = 1 and n[Children]{0}[Name] = "BR"
+//                                    then {}
+//                                    else { "#(lf)" }
+//                                else {},
+//                        lines = List.Combine({ text, children, br })
+//                    in
+//                        lines,
+//                (n, t) => t)
+//        in
+//            lines,
 
     Batch = (items as list, batchSize as number) as list =>
         List.Generate(
@@ -55,8 +58,44 @@ let
             each [batch = List.FirstN([tail], batchSize), tail = List.Skip([tail], batchSize)],
             each [batch]),
 
+    /// <summary>
+    /// Returns the contents downloaded from a web as a binary value. In contract to standard
+    /// Web.Contents this function automatically unwraps error messages for standard HTTP status
+    /// codes and translates them to Power Query errors.
+    /// </summary>
+    ContentsWithErrorUnwrapping = (url as text, optional options as record) as binary =>
+        let
+            #"Get system status codes" = { 400, 429, 500, 503 },
+
+            #"Get options" = if options <> null then options else [],
+            #"Get user status codes" = Record.FieldOrDefault(#"Get options", "ManualStatusHandling", {}),
+            #"Get handled status codes" = List.Difference(#"Get system status codes", #"Get user status codes"),
+
+            #"Update ManualStatusHandling" = #"Get options" & [
+                ManualStatusHandling = #"Get system status codes" &  #"Get user status codes"
+            ],
+            #"Get contents" = VSTS.Contents(url, #"Update ManualStatusHandling"),
+            #"Buffer contents" = Binary.Buffer(#"Get contents") meta Value.Metadata(#"Get contents"),
+            #"Get status code" = Record.FieldOrDefault(Value.Metadata(#"Buffer contents"), "Response.Status", 0),
+            #"Get error" = try Json.Document(#"Buffer contents")
+                otherwise try [message = Text.FromBinary(#"Buffer contents")] 
+                otherwise [],
+            #"Get result" = if List.Contains(#"Get handled status codes", #"Get status code")
+                then error Error.Record("Error",
+                    Record.FieldOrDefault(#"Get error", "message", "VSTS.Contents failed to get contents from '" & url & "' (" & Number.ToText(#"Get status code") & ")" ),
+                    [
+                        DataSourceKind = "Visual Studio Team Services", 
+                        ActivityId = Diagnostics.ActivityId(),
+                        Url = url
+                    ] 
+                    & Record.RemoveFields(#"Get error", {"message", "innerException", "innererror", "$id" }, MissingField.Ignore))
+                    meta Value.Metadata(#"Buffer contents")
+                else #"Buffer contents"
+        in
+            #"Get result",
+
     WiqlContents = (url as text) as binary =>
-        VSTS.Contents(url, [Version = Version]),
+        ContentsWithErrorUnwrapping(url, [Version = Version]),
 
     WiqlQueryById = (url as text, scope as record, id as text) =>
         let
@@ -226,7 +265,7 @@ let
             #"Expand relation" = Table.ExpandRecordColumn(#"Convert to table", "Record", {"rel", "target", "source"}, {"Link Type", "target", "source"}),
             #"Expand target" = Table.ExpandRecordColumn(#"Expand relation", "target", {"id"}, {"Target ID"}),
             #"Expand source" = Table.ExpandRecordColumn(#"Expand target", "source", {"id"}, {"Source ID"}),
-            #"Select relations" = Table.SelectRows(#"Expand source", each ([Link Type] <> null)),
+            #"Select relations" = Table.SelectRows(#"Expand source", each [Source ID] <> null and [Target ID] <> null),
 
             #"Get fields" = List.Distinct(
                 { "System.Id", "System.Title", "System.WorkItemType" }
