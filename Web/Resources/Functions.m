@@ -1,5 +1,5 @@
 let
-    Version = "vsts-open-in-powerbi/1.0.1",
+    Version = "vsts-open-in-powerbi/1.0.2",
     
     BatchSize = 200,
     MaxFieldsCount = 100,
@@ -102,6 +102,7 @@ let
             #"Format url" = url
                 & (if scope[Collection]? <> null then "/" & Uri.EscapeDataString(scope[Collection]) else "")
                 & (if scope[Project]? <> null then "/" & Uri.EscapeDataString(scope[Project]) else "")
+                & (if scope[Project]? <> null and scope[Team]? <> null then "/" & Uri.EscapeDataString(scope[Team]) else "")
                 & "/_apis/wit/wiql/" & Uri.EscapeDataString(id) 
                 & "?api-version=1.0",
             #"Get result" = Json.Document(WiqlContents(#"Format url"))
