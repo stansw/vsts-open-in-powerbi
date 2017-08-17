@@ -30,7 +30,8 @@ namespace Web.Controllers
         }
 
         // GET _api/Template/flat?url=https://stansw.visualstudio.com&project=vsts-open-in-powerbi&qid=d5349265-9c9d-4808-933a-c3d27b731657&qname=Flat%20Work%20Items
-        public HttpResponseMessage Get(string id, string url, string project, string qname, Guid qid)
+        // GET _api/Template/flat?url=https://stansw.visualstudio.com&project=vsts-open-in-powerbi&team=vsts-open-in-powerbi%20Team&qid=d5349265-9c9d-4808-933a-c3d27b731657&qname=Flat%20Work%20Items
+        public HttpResponseMessage Get(string id, string url, string project, string qname, Guid qid, string team = null)
         {
             // Trace event but do *not* save information which might be considered private.
             _telemetry.TrackEvent("TemplateController.Get", new Dictionary<string, string>()
@@ -40,7 +41,7 @@ namespace Web.Controllers
             });
 
             var response = new HttpResponseMessage(HttpStatusCode.OK);
-            response.Content = new ByteArrayContent(this.BuildTemplate(id, url, project, qid.ToString("D")));
+            response.Content = new ByteArrayContent(this.BuildTemplate(id, url, project, team, qid.ToString("D")));
             response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
             response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
             {
@@ -50,12 +51,13 @@ namespace Web.Controllers
             return response;
         }
 
-        public byte[] BuildTemplate(string template, string url, string project, string id)
+        public byte[] BuildTemplate(string template, string url, string project, string team, string id)
         {
             var parameters = new Dictionary<string, string>()
             {
                 ["url"] = url,
                 ["project"] = project,
+                ["team"] = team,
                 ["id"] = id
             };
 
@@ -94,7 +96,9 @@ namespace Web.Controllers
                     {
                         sectionText = Regex.Replace(sectionText,
                             $@" {Regex.Escape(parameter.Key)}\s*=\s*""[^""]*""",
-                            $@" {parameter.Key} = ""{parameter.Value}""");
+                            parameter.Value != null
+                                ?  $@" {parameter.Key} = ""{parameter.Value}"""
+                                :  $@" {parameter.Key} = null" );
                     }
 
                     if (!editor.TrySetSectionText(PackageEditor.DefaultSectionName, sectionText, out sourceError))
