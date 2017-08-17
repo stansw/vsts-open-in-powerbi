@@ -38,6 +38,7 @@ RestClient.getClient().getQuery(configuration.projectName, configuration.qid, Co
             + "?" + $.param({
                 url: configuration.hostUrl,
                 project: configuration.projectName,
+                team: configuration.teamName,
                 qid: configuration.qid,
                 qname: query.name
             });

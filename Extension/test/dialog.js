@@ -31,6 +31,7 @@ define(["require", "exports", "TFS/WorkItemTracking/Contracts", "TFS/WorkItemTra
             + "?" + $.param({
             url: configuration.hostUrl,
             project: configuration.projectName,
+            team: configuration.teamName,
             qid: configuration.qid,
             qname: query.name
         });

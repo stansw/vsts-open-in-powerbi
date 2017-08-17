@@ -48,6 +48,7 @@ export interface IDialogConfiguration {
     close: () => void;
     hostUrl: string;
     projectName: string;
+    teamName: string;
     qid: string;
 }
 
@@ -69,6 +70,7 @@ export var openQueryAction = {
                             close: null,
                             hostUrl: context.host.uri,
                             projectName: context.project.name,
+                            teamName: context.team.name,
                             qid: actionContext.query.id
                         });
                     }
@@ -93,6 +95,7 @@ export var openQueryOnToolbarAction = {
                         close: null,
                         hostUrl: context.host.uri,
                         projectName: context.project.name,
+                        teamName: context.team.name,
                         qid: actionContext.query.id
                     });
                 }

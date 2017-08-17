@@ -45,6 +45,7 @@ define(["require", "exports"], function (require, exports) {
                                     close: null,
                                     hostUrl: context_1.host.uri,
                                     projectName: context_1.project.name,
+                                    teamName: context_1.team.name,
                                     qid: actionContext.query.id
                                 });
                             }
@@ -67,6 +68,7 @@ define(["require", "exports"], function (require, exports) {
                                 close: null,
                                 hostUrl: context_2.host.uri,
                                 projectName: context_2.project.name,
+                                teamName: context_2.team.name,
                                 qid: actionContext.query.id
                             });
                         }
