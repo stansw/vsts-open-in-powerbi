@@ -14,11 +14,11 @@
     <script>
         require.config({
             paths: {
-                "jszip": "out/lib/jszip.min",
+                "jszip": "node_modules/jszip/dist/jszip.min",
             }
         });
 
-        require(["./dist/app.bundle"], function (app) {
+        require(["./out/app.bundle"], function (app) {
             app.downloadAsync();
         });
     </script>

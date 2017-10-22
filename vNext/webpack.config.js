@@ -8,7 +8,8 @@ module.exports = {
     },
     output: {
         filename: "[name].bundle.js",
-        libraryTarget: "amd"
+        libraryTarget: "amd",
+        path: path.resolve(__dirname, 'out')
     },
     devtool: "source-map",
     externals: [
