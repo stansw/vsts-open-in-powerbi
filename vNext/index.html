@@ -3,25 +3,23 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <script type="text/javascript" src="/out/lib/ai.0.js"></script>   
-    <script type="text/javascript">   
-        // var snippet = {   
-        //     config: {   
-        //         instrumentationKey: "478f349e-1267-43eb-a2aa-b70654cb6409"
-        //     }   
-        // };   
-        // var init = new Microsoft.ApplicationInsights.Initialization(snippet);   
-        // var appInsights = init.loadAppInsights();   
-        // appInsights.trackPageView();
-    </script>   
 
+    <!-- Base scripts used to setup the extension for debugging -->
     <script src="node_modules/requirejs/require.js"></script>
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    
+
+    <!-- Standard scripts used in the extension  -->
+    <script src="out/lib/ai.0.js"></script>
     <script src="out/lib/VSS.SDK.min.js"></script>
+    <script src="out/lib/jquery.binarytransport.js"></script>
     <script>
         require.config({
             paths: {
                 'telemetryclient-team-services-extension': 'out/lib/telemetryclient',
-                'applicationinsights-js': 'out/lib/ai.0'
+                'applicationinsights-js': 'out/lib/ai.0',
+                'jszip': 'out/lib/jszip.min',
+                'file-saver': 'out/lib/FileSaver.min'
             }
         });
 

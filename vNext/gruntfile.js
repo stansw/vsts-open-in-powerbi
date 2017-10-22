@@ -4,7 +4,7 @@
             build: {
                 tsconfig: true,
             },
-            buildTest: {
+            watch: {
                 tsconfig: true,
                 watch: "."
             },
@@ -54,6 +54,24 @@
                         flatten: true,
                         src: ["node_modules/applicationinsights-js/dist/ai.0.js"],
                         dest: "out/lib/"
+                    },
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ["node_modules/jszip/dist/jszip.min.js"],
+                        dest: "out/lib/"
+                    },
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ["lib/jquery.binarytransport.js"],
+                        dest: "out/lib/"
+                    },
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ["lib/FileSaver.min.js"],
+                        dest: "out/lib/"
                     }
                 ]
             }
@@ -84,6 +102,8 @@
     grunt.registerTask("package-release", ["build", "exec:package_release"]);
     grunt.registerTask("publish-dev", ["package-dev", "exec:publish_dev"]);
     grunt.registerTask("publish-release", ["package-release", "exec:publish_release"]);
+
+    grunt.registerTask("watch-build", ["copy:scripts", "ts:watch"]);
 
     grunt.registerTask("default", ["package-dev"]);
 };
