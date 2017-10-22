@@ -13,6 +13,10 @@
             "taskName": "publish",
             "isBuildCommand": false,
             "problemMatcher": "$msCompile"
+        },
+        {
+            "taskName": "test",
+            "isTestCommand": true
         }
     ]
 }
