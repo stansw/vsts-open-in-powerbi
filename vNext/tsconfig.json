@@ -4,11 +4,15 @@
     "moduleResolution": "node",
     "target": "es5",
     "rootDir": ".",
+    "outDir": "out",
     "types": [
       "vss-web-extension-sdk",
       "mocha"
     ]
   },
+  "files": [
+    
+  ],
   "exclude": [
     "node_modules"
   ]

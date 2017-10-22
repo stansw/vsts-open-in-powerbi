@@ -1,17 +1,12 @@
+ /// <reference types="vss-web-extension-sdk" />
 import * as tc from "telemetryclient-team-services-extension";
-
-const telemetryClientSettings: tc.TelemetryClientSettings = {
-    key: "478f349e-1267-43eb-a2aa-b70654cb6409",
-    extensioncontext: "vsts-open-in-powerbi-tralala",
-    disableTelemetry: "false",
-    disableAjaxTracking: "false",
-    enableDebug: "false"
-};
-
+import telemetryClientSettings = require("./telemetryClientSettings");
 export class Greeter {
     element: HTMLElement;
     span: HTMLElement;
     timerToken: number;
+
+    public static value = 10;
 
     constructor(element: HTMLElement) {
         this.element = element;
@@ -32,7 +27,7 @@ export class Greeter {
 }
 
 const el = document.getElementById("content");
-const greeter = new Greeter(el);
-greeter.start();
+//const greeter = new Greeter(el);
+//greeter.start();
 
-tc.TelemetryClient.getClient(telemetryClientSettings).trackPageView("vsts-open-in-powerbi-tralala.Index");
+tc.TelemetryClient.getClient(telemetryClientSettings.settings).trackPageView("vsts-open-in-powerbi-tralala.Index");

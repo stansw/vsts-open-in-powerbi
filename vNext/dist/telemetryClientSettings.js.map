@@ -1,0 +1,1 @@
+{"version":3,"file":"telemetryClientSettings.js","sourceRoot":"","sources":["../src/telemetryClientSettings.ts"],"names":[],"mappings":";;;IAEa,QAAA,QAAQ,GAA+B;QAChD,GAAG,EAAE,sCAAsC;QAC3C,gBAAgB,EAAE,8BAA8B;QAChD,gBAAgB,EAAE,OAAO;QACzB,mBAAmB,EAAE,OAAO;QAC5B,WAAW,EAAE,OAAO;KACvB,CAAC"}

@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "id": "vsts-open-in-powerbi-tralala",
-  "version": "0.1.2",
+  "version": "0.1.1",
   "name": "vsts-open-in-powerbi-tralala",
   "scopes": [],
   "description": "This extension opens Work Items and query results in Power BI Desktop",
@@ -57,8 +57,9 @@
   },
   "files": [
     {
-      "path": "dist",
-      "addressable": true
+      "path": "out/src",
+      "addressable": true,
+      "packagePath": "src"
     },
     {
       "path": "static/images/logo.png",

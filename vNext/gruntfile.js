@@ -3,21 +3,10 @@
         ts: {
             build: {
                 tsconfig: true,
-                outDir: "./out/release",
-                src: ["./src/**/*.ts"],
-                options: {
-                    module: "amd",
-                    sourceMap: false
-                }
             },
-            buildDebug: {
+            buildTest: {
                 tsconfig: true,
-                outDir: "./out/debug",
-                watch: ".",
-                options: {
-                    module: "umd",
-                    sourceMap: true
-                },
+                watch: "."
             },
             options: {
                 fast: 'never'
@@ -45,18 +34,38 @@
                 stderr: true
             }
         },
+        copy: {
+            scripts: {
+                files: [{
+                    expand: true,
+                    flatten: true,
+                    src: ["node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js"],
+                    dest: "build",
+                    filter: "isFile"
+                }]
+            }
+        },
 
-        clean: ["out/**/*.js", "out/**/*.js.map", "*.vsix"],
+        clean: ["scripts/**/*.js", "*.vsix", "build", "test"],
+
+        karma: {
+            unit: {
+                configFile: 'karma.conf.js',
+                singleRun: true,
+                browsers: ["PhantomJS"]
+            }
+        }
     });
 
     grunt.loadNpmTasks("grunt-ts");
     grunt.loadNpmTasks("grunt-exec");
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-karma');
 
-    grunt.registerTask("build", ["ts:build"]);
+    grunt.registerTask("build", ["ts:build", "copy:scripts"]);
 
-    grunt.registerTask("debug", ["clean", "ts:buildDebug"]);
+    grunt.registerTask("test", ["ts:buildTest", "karma:unit"]);
 
     grunt.registerTask("package-dev", ["build", "exec:package_dev"]);
     grunt.registerTask("package-release", ["build", "exec:package_release"]);
