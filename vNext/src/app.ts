@@ -1,20 +1,7 @@
-/// <reference path="../node_modules/applicationinsights-js/bundle/ai.module.d.ts" />
-
 //https://github.com/Microsoft/TypeScript/issues/4717
-import "jquery-binarytransport";
+import "jquery-binarytransport"; // Load for side effects
 
-
-let init = new (<any>Microsoft).ApplicationInsights.Initialization({
-    config: {
-        instrumentationKey: "478f349e-1267-43eb-a2aa-b70654cb6409"
-    }
-});
-let appInsights = <Microsoft.ApplicationInsights.IAppInsights>init.loadAppInsights();
-
-let webContext = VSS.getWebContext();
-if (webContext !== undefined) {
-    appInsights.setAuthenticatedUserContext(webContext.user.id, webContext.collection.id);
-}
+import { AppInsights } from "./telemetry";
 
 //appInsights.trackEvent("test", { data1: "s" })
 import * as JSZip from "jszip";
@@ -52,7 +39,7 @@ export class Greeter {
 const el = document.getElementById("content");
 
 
-function ajaxAsync(url : string) {
+function ajaxAsync(url: string) {
     return new Promise<Blob>((resolve, reject) => {
         $.ajax({
             url: url,
@@ -63,8 +50,9 @@ function ajaxAsync(url : string) {
             .fail((jqXHR, textStatus, errorThrown) =>
                 reject(errorThrown instanceof Error
                     ? errorThrown
-                    : new Error(errorThrown.toString()))
-            )
+                    : new Error(`Failed to get resource: ${url} (${errorThrown.toString()})`)
+                )
+            );
     });
 }
 
@@ -110,7 +98,7 @@ async function downloadAsync() {
 
         fileSaver.saveAs(pbitBytesNew, "hello.pbit");
     } catch (exception) {
-        appInsights.trackException(exception, "sdf", { template: "Flat" });
+        AppInsights.trackException(exception, "sdf", { template: "Flat" });
         console.log("Operation failed")
     }
 }
@@ -193,7 +181,7 @@ new Promise<Blob>((resolve, reject) => {
         fileSaver.saveAs(blob, "hello.pbit");
     })
     .catch(reason => {
-        appInsights.trackException(reason, "sdf", { template: "Flat" });
+        AppInsights.trackException(reason, "sdf", { template: "Flat" });
         console.log("Operation failed")
     });
 
