@@ -1,6 +1,6 @@
-vsts-open-in-powerbi-tralala
+vsts-open-in-powerbi
 
-Copyright (c) //TODO:Add owners name
+Copyright (c) Stanislaw Swierc
 
 All rights reserved.
 

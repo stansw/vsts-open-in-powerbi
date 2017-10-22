@@ -10,20 +10,16 @@
     
 
     <!-- Standard scripts used in the extension  -->
-    <script src="node_modules/applicationinsights-js/dist/ai.0.js"></script>
     <script src="node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js"></script>
     <script>
         require.config({
             paths: {
-                //'telemetryclient-team-services-extension': 'out/lib/telemetryclient',
-                //'applicationinsights-js': 'out/lib/ai.0',
-                'jszip': 'out/lib/jszip.min',
-                'app': 'dist/app.bundle'
+                "jszip": "out/lib/jszip.min",
             }
         });
 
-        require(['app'], function (app) {
-
+        require(["./dist/app.bundle"], function (app) {
+            app.downloadAsync();
         });
     </script>
 </head>

@@ -10,7 +10,7 @@
             true,
             "spaces"
         ],
-        "no-consecutive-blank-lines": true,
+        "no-consecutive-blank-lines": false,
         "no-console": false,
         "no-duplicate-variable": true,
         "no-eval": true,

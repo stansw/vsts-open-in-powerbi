@@ -1,4 +1,4 @@
-// Use this code to statically load ai.0.js library 
+// Use this code to statically load ai.0.js library
 // https://github.com/Microsoft/ApplicationInsights-JS
 // /// <reference path="../node_modules/applicationinsights-js/bundle/ai.module.d.ts" />
 // let init = new (<any>Microsoft).ApplicationInsights.Initialization({
@@ -17,4 +17,4 @@ if (webContext) {
     appInsights.setAuthenticatedUserContext(webContext.user.id, webContext.collection.id);
 }
 
-export var AppInsights = ai.AppInsights;
+export let AppInsights = ai.AppInsights;
