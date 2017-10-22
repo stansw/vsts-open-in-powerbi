@@ -115,7 +115,11 @@ async function tralala() {
             queryName: query.name
         });
 
-    downloadAsync(url);
+    if ("ArrayBuffer" in window ) {
+        downloadAsync(url);
+    } else {
+
+    }
 }
 
 tralala();
