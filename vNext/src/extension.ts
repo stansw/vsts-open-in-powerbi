@@ -1,5 +1,3 @@
-// import * as App from "./app";
-
 namespace SupportedActions {
     export const OpenItems = "OpenItems";
     export const OpenQuery = "OpenQuery";
@@ -15,20 +13,21 @@ namespace WellKnownQueries {
     export const RecycleBin = "2650C586-0DE4-4156-BA0E-14BCFB664CCA";
 }
 
-export let queryExclusionList = [
+let queryExclusionList = [
     WellKnownQueries.AssignedToMe,
     WellKnownQueries.UnsavedWorkItems,
     WellKnownQueries.FollowedWorkItems,
     WellKnownQueries.CreatedBy,
     WellKnownQueries.SearchResults,
     WellKnownQueries.CustomWiql,
-    WellKnownQueries.RecycleBin];
+    WellKnownQueries.RecycleBin
+];
 
-export function isSupportedQueryId(queryId: string) {
+function isSupportedQueryId(queryId: string) {
     return queryId && queryExclusionList.indexOf(queryId.toUpperCase()) === -1;
 }
 
-export interface IQueryObject {
+interface IQueryObject {
     id: string;
     isPublic: boolean;
     name: string;
@@ -36,7 +35,7 @@ export interface IQueryObject {
     wiql: string;
 }
 
-export interface IActionContext {
+interface IActionContext {
     id?: number;            // From card
     workItemId?: number;    // From work item form
     query?: IQueryObject;
@@ -45,6 +44,64 @@ export interface IActionContext {
     workItemIds?: number[]; // From backlog/iteration (context menu) and query results (toolbar and context menu)
     columns?: string[];
 }
+
+interface IConfiguration {
+    queryId: string;
+    close?: () => void;
+}
+
+async function openQuery(queryId: string) {
+    let extensionContext = VSS.getExtensionContext();
+    let dialog: IExternalDialog;
+
+    let configuration = <IConfiguration>{
+        queryId: queryId,
+        close: () => dialog.close()
+    };
+
+    let hostDialogService = await VSS.getService<IHostDialogService>(VSS.ServiceIds.Dialog);
+    dialog = await hostDialogService.openDialog(
+        `${extensionContext.publisherId}.${extensionContext.extensionId}.notificationDialog`,
+        {
+            title: "Downloading Power BI file...",
+            width: 400,
+            height: 670,
+            modal: true,
+            draggable: false,
+            resizable: false,
+            buttons: {
+                "ok": {
+                    id: "ok",
+                    text: "Dismiss",
+                    click: () => {
+                        dialog.close();
+                    },
+                    class: "cta",
+                }
+            }
+        },
+        configuration);
+}
+
+export let openQueryAction = {
+    getMenuItems: (context: any) => {
+        if (!context || !context.query || !context.query.wiql || !isSupportedQueryId(context.query.id)) {
+            return null;
+        }
+        else {
+            return [<IContributedMenuItem>{
+                title: "Open in Power BI",
+                text: "Open in Power BI",
+                icon: "img/powerbi_logo_16x16.png",
+                action: (actionContext: IActionContext) => {
+                    if (actionContext && actionContext.query && actionContext.query.id) {
+                        openQuery(actionContext.query.id);
+                    }
+                }
+            }];
+        }
+    }
+};
 
 export let openQueryOnToolbarAction = {
     getMenuItems: (context: any) => {
@@ -55,24 +112,15 @@ export let openQueryOnToolbarAction = {
             showText: true,
             action: async (actionContext: IActionContext) => {
                 if (actionContext && actionContext.query && actionContext.query.wiql && isSupportedQueryId(actionContext.query.id)) {
-                    let context = VSS.getWebContext();
-
-                    // App.downloadAsync();
+                    openQuery(actionContext.query.id);
                 }
                 else {
-                    let services = await VSS.getService(VSS.ServiceIds.Dialog);
-                    let hostDialogService = services[0] as IHostDialogService;
-
+                    let hostDialogService = await VSS.getService<IHostDialogService>(VSS.ServiceIds.Dialog);
                     hostDialogService.openMessageDialog(
                         "In order to open query please save it first in \"My Queries\" or \"Shared Queries\".",
                         {
                             title: "Unable to perform this operation",
-                            buttons: [
-                                {
-                                    id: "ok",
-                                    text: "OK"
-                                }
-                            ]
+                            buttons: [hostDialogService.buttons.ok]
                         });
                 }
             }
@@ -81,5 +129,5 @@ export let openQueryOnToolbarAction = {
 };
 
 let extensionContext = VSS.getExtensionContext();
-// VSS.register(`${extensionContext.publisherId}.${extensionContext.extensionId}.openQueryAction`, App.openQueryAction);
+VSS.register(`${extensionContext.publisherId}.${extensionContext.extensionId}.openQueryAction`, openQueryAction);
 VSS.register(`${extensionContext.publisherId}.${extensionContext.extensionId}.openQueryOnToolbarAction`, openQueryOnToolbarAction);
