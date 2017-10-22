@@ -10,6 +10,7 @@
     "lint": "tslint -c tslint.json 'src/*.ts'"
   },
   "devDependencies": {
+    "@types/applicationinsights-js": "^1.0.4",
     "@types/jquery": "^2.0.34",
     "@types/jszip": "0.0.33",
     "@types/q": "0.0.32",
@@ -33,7 +34,7 @@
     "webpack": "^2.5.1"
   },
   "dependencies": {
-    "applicationinsights-js": "^1.0.11",
+    "applicationinsights-js": "^1.0.12",
     "jszip": "^3.1.4",
     "telemetryclient-team-services-extension": "*",
     "vss-web-extension-sdk": "^2.117.0"

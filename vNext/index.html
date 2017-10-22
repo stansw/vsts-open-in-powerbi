@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <script type="text/javascript" src="/out/lib/ai.0.js"></script>   
+    <script type="text/javascript">   
+        // var snippet = {   
+        //     config: {   
+        //         instrumentationKey: "478f349e-1267-43eb-a2aa-b70654cb6409"
+        //     }   
+        // };   
+        // var init = new Microsoft.ApplicationInsights.Initialization(snippet);   
+        // var appInsights = init.loadAppInsights();   
+        // appInsights.trackPageView();
+    </script>   
+
+    <script src="node_modules/requirejs/require.js"></script>
+    <script src="out/lib/VSS.SDK.min.js"></script>
+    <script>
+        require.config({
+            paths: {
+                'telemetryclient-team-services-extension': 'out/lib/telemetryclient',
+                'applicationinsights-js': 'out/lib/ai.0'
+            }
+        });
+
+        require(['out/src/app'], function (app) {
+
+        });
+    </script>
+</head>
+
+<body>
+    <div id="container" style="width:800px;height:600px;border:1px solid grey"></div>
+</body>
+
+</html>
