@@ -16,14 +16,15 @@
     <script>
         require.config({
             paths: {
-                'telemetryclient-team-services-extension': 'out/lib/telemetryclient',
-                'applicationinsights-js': 'out/lib/ai.0',
+                //'telemetryclient-team-services-extension': 'out/lib/telemetryclient',
+                //'applicationinsights-js': 'out/lib/ai.0',
                 'jszip': 'out/lib/jszip.min',
-                'file-saver': 'out/lib/FileSaver.min'
+                //'file-saver': 'out/lib/FileSaver.min'
+                'app': 'dist/app.bundle'
             }
         });
 
-        require(['out/src/app'], function (app) {
+        require(['app'], function (app) {
 
         });
     </script>

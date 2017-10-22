@@ -17,7 +17,6 @@ import * as JSZip from "jszip";
 
 // Import file-saver and account for a bug in the type definitions.
 import * as fileSaver from "file-saver";
-let saveAs: typeof fileSaver.saveAs = <any>fileSaver;
 
 export class Greeter {
     element: HTMLElement;
@@ -49,10 +48,10 @@ export class Greeter {
 const el = document.getElementById("content");
 
 
-function ajaxAsync() {
+function ajaxAsync(url : string) {
     return new Promise<Blob>((resolve, reject) => {
         $.ajax({
-            url: "static/templates/Flat.pbit",
+            url: url,
             type: "GET",
             dataType: "binary"
         })
@@ -67,9 +66,9 @@ function ajaxAsync() {
 
 async function downloadAsync() {
     try {
-        let pbitBytes = await ajaxAsync();
+        let pbitBytes = await ajaxAsync("static/templates/Flat.pbit");
         let pbitZip = await new JSZip().loadAsync(pbitBytes);
-        let mashupBuffer = await pbitZip.file("DataMashup").async("arraybuffer") as ArrayBuffer;
+        let mashupBuffer = await pbitZip.file("DataMashup").async("arraybuffer");
 
         let headerView = new Int32Array(mashupBuffer, 0, 2);
         let partsBytesCount = headerView[1];
@@ -78,7 +77,7 @@ async function downloadAsync() {
 
         let partsZip = new JSZip();
         let parts = await partsZip.loadAsync(partsBytes)
-        let section = await parts.file("Formulas/Section1.m").async("string") as string;
+        let section = await parts.file("Formulas/Section1.m").async("string");
 
         section = section.replace(/stansw/, "dziala");
         parts.remove("Formulas/Section1.m");
@@ -105,7 +104,7 @@ async function downloadAsync() {
 
         let pbitBytesNew = await pbitZip.generateAsync({ type: "blob" });
 
-        saveAs(pbitBytesNew, "hello.pbit");
+        fileSaver.saveAs(pbitBytesNew, "hello.pbit");
     } catch (exception) {
         appInsights.trackException(exception, "sdf", { template: "Flat" });
         console.log("Operation failed")
@@ -187,7 +186,7 @@ new Promise<Blob>((resolve, reject) => {
         return <Promise<Blob>>pbit.generateAsync({ type: "blob" })
     })
     .then(blob => {
-        saveAs(blob, "hello.pbit");
+        fileSaver.saveAs(blob, "hello.pbit");
     })
     .catch(reason => {
         appInsights.trackException(reason, "sdf", { template: "Flat" });
