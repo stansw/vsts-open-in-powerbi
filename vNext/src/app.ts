@@ -51,16 +51,20 @@ const el = document.getElementById("content");
 
 new Promise<Blob>((resolve, reject) => {
     $.ajax({
-        url: "static/templates/Flat.pbit",
+        url: "static/templates/Flat.pbitx",
         type: "GET",
         dataType: "binary"
     })
-    .done((data) => resolve(data))
-    .fail(reason => reject(reason))
+        .done((value) => resolve(value))
+        .fail((jqXHR, textStatus, errorThrown) =>
+            reject(errorThrown instanceof Error
+                ? errorThrown
+                : new Error(errorThrown.toString()))
+        )
 })
-    .then(data => {
+    .then(value => {
         var zip = new JSZip();
-        return zip.loadAsync(data)
+        return zip.loadAsync(value)
     })
     .then(pbit => {
         return pbit.file("DataMashup")
@@ -72,9 +76,6 @@ new Promise<Blob>((resolve, reject) => {
                 let otherBytesView = new Uint8Array(mashupBuffer, 1 + 8 + partsBytesCount);
 
                 let partsZip = new JSZip();
-
-
-
                 return partsZip.loadAsync(partsBytes)
                     .then(parts => {
                         return parts.file("Formulas/Section1.m")
@@ -123,6 +124,7 @@ new Promise<Blob>((resolve, reject) => {
         saveAs(blob, "hello.pbit");
     })
     .catch(reason => {
+        appInsights.trackException(reason, "sdf", { template: "Flat" });
         console.log("Operation failed")
     });
 
