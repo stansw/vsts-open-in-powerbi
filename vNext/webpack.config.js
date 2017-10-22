@@ -4,7 +4,7 @@ var webpack = require("webpack");
 module.exports = {
     target: "web",
     entry: {
-        app: "./src/app.ts"
+        extension: "./src/extension.ts"
     },
     output: {
         filename: "[name].bundle.js",

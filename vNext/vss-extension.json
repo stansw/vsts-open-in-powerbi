@@ -1,16 +1,16 @@
 {
     "manifestVersion": 1,
-    "id": "vsts-open-in-powerbi",
-    "version": "0.1.8",
-    "name": "Open in Power BI",
-    "public": true,
+    "id": "vsts-open-in-powerbi-dev",
+    "version": "0.1.26",
+    "name": "Open in Power BI (Dev)",
+    "public": false,
     "scopes": [
         "vso.work"
     ],
     "description": "This extension opens Work Items and query results in Power BI Desktop",
     "publisher": "stansw",
     "icons": {
-        "default": "img/powerbi_logo_128x128.png"
+        "default": "static/images/powerbi_logo_128x128.png"
     },
     "targets": [
         {
@@ -51,16 +51,16 @@
   "files": [
     {
       "path": "out",
-      "addressable": true,
+      "addressable": true
     },
     {
       "path": "static",
       "addressable": true
     },
     {
-      "path": "node_modules/vss-web-extension-sdk/lib",
+      "path": "node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js",
       "addressable": true,
-      "packagePath": "lib"
+      "packagePath": "lib/VSS.SDK.min.js"
     }
     ,{
       "path": "node_modules/jszip/dist/jszip.min.js",
@@ -74,18 +74,6 @@
     ],
     "contributions": [
         {
-            "id": "openQueryAction",
-            "type": "ms.vss-web.action-provider",
-            "description": "Open in Power BI context menu on a query definition.",
-            "targets": [
-                "ms.vss-work-web.work-item-query-menu"
-            ],
-            "properties": {
-                "group": "contributed",
-                "uri": "index.html"
-            }
-        },
-        {
             "id": "openQueryOnToolbarAction",
             "type": "ms.vss-web.action-provider",
             "description": "Open in Power BI toolbar menu item on the query results.",
@@ -94,7 +82,7 @@
             ],
             "properties": {
                 "group": "contributed",
-                "uri": "index.html"
+                "uri": "static/index.html"
             }
         },
         {

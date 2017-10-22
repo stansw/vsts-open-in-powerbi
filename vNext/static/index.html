@@ -3,27 +3,32 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>TypeScript HTML App</title>
+    <title>Open in Power BI</title>
     <link rel="stylesheet" href="css/app.css" type="text/css" />
     <script src="../lib/VSS.SDK.min.js"></script>
-    <script src="../lib/ai.0.js"></script>
 </head>
 <body>
     <script type="text/javascript">
         // Initialize the VSS sdk
-        VSS.init({
+        VSS.init( { 
+            explicitNotifyLoaded: true,
             usePlatformScripts: true,
-            usePlatformStyles: true
+            usePlatformStyles: true, 
+            moduleLoaderConfig: { 
+                paths: { 
+                    "jszip": "lib/jszip.min",
+                 } 
+            } 
         });
 
-        // Wait for the SDK to be initialized
+        // Wait for the SDK to be initialized and load the extension.
         VSS.ready(function () {
-            VSS.require(["dist/app"], function (app) {});
+            VSS.require(["out/extension.bundle"], function (extension) {
+                // Loading succeeded.
+                VSS.notifyLoadSucceeded();
+            });
         });
     </script>
-
-    <h1>TypeScript HTML App</h1>
-
     <div id="content"></div>
 </body>
 </html>

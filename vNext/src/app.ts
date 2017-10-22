@@ -58,7 +58,7 @@ function ajaxAsync(url: string) {
 
 export async function downloadAsync() {
     try {
-        let pbitBytes = await ajaxAsync("static/templates/Flat.pbit");
+        let pbitBytes = await ajaxAsync("templates/Flat.pbit");
         let pbitZip = await new JSZip().loadAsync(pbitBytes);
         let mashupBuffer = await pbitZip.file("DataMashup").async("arraybuffer");
 
@@ -103,12 +103,10 @@ export async function downloadAsync() {
     }
 }
 
-downloadAsync();
-
 
 new Promise<Blob>((resolve, reject) => {
     $.ajax({
-        url: "static/templates/Flat.pbit",
+        url: "templates/Flat.pbit",
         type: "GET",
         dataType: "binary"
     })
