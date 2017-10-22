@@ -1,5 +1,9 @@
 /// <reference path="../node_modules/applicationinsights-js/bundle/ai.module.d.ts" />
 
+//https://github.com/Microsoft/TypeScript/issues/4717
+import "jquery-binarytransport";
+
+
 let init = new (<any>Microsoft).ApplicationInsights.Initialization({
     config: {
         instrumentationKey: "478f349e-1267-43eb-a2aa-b70654cb6409"
