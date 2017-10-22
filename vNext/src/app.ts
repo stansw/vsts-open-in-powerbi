@@ -17,7 +17,7 @@ import * as JSZip from "jszip";
 
 // Import file-saver and account for a bug in the type definitions.
 import * as fileSaver from "file-saver";
-let saveAs :  typeof fileSaver.saveAs = <any>fileSaver;
+let saveAs: typeof fileSaver.saveAs = <any>fileSaver;
 
 export class Greeter {
     element: HTMLElement;
@@ -49,74 +49,81 @@ export class Greeter {
 const el = document.getElementById("content");
 
 
-
-$.ajax({
+new Promise<Blob>((resolve, reject) => {
+    $.ajax({
         url: "static/templates/Flat.pbit",
         type: "GET",
         dataType: "binary"
     })
-    .then((data: Blob) => {
+    .done((data) => resolve(data))
+    .fail(reason => reject(reason))
+})
+    .then(data => {
         var zip = new JSZip();
-        zip.loadAsync(data)
-            .then(pbit => {
-                return pbit.file("DataMashup")
-                    .async("arraybuffer")
-                    .then((mashupBuffer : ArrayBuffer) => {
-                        let headerView = new Int32Array(mashupBuffer, 0, 2);
-                        let partsBytesCount = headerView[1];
-                        let partsBytes = new Uint8Array(mashupBuffer, 8, 8 + partsBytesCount);
-                        let otherBytesView = new Uint8Array(mashupBuffer, 1 + 8 + partsBytesCount);
+        return zip.loadAsync(data)
+    })
+    .then(pbit => {
+        return pbit.file("DataMashup")
+            .async("arraybuffer")
+            .then((mashupBuffer: ArrayBuffer) => {
+                let headerView = new Int32Array(mashupBuffer, 0, 2);
+                let partsBytesCount = headerView[1];
+                let partsBytes = new Uint8Array(mashupBuffer, 8, 8 + partsBytesCount);
+                let otherBytesView = new Uint8Array(mashupBuffer, 1 + 8 + partsBytesCount);
 
-                        let partsZip = new JSZip();
+                let partsZip = new JSZip();
 
-                        
 
-                        return partsZip.loadAsync(partsBytes)
-                            .then(parts => {
-                                return parts.file("Formulas/Section1.m")
-                                    .async("string")
-                                    .then((section : string) => {
-                                         section = section.replace(/stansw/, "dziala");
-                                         parts.remove("Formulas/Section1.m");
-                                         parts.file("Formulas/Section1.m", section);
-                                         return parts;
-                                    })
+
+                return partsZip.loadAsync(partsBytes)
+                    .then(parts => {
+                        return parts.file("Formulas/Section1.m")
+                            .async("string")
+                            .then((section: string) => {
+                                section = section.replace(/stansw/, "dziala");
+                                parts.remove("Formulas/Section1.m");
+                                parts.file("Formulas/Section1.m", section);
+                                return parts;
                             })
-                            .then(parts => {
-                                return <Promise<Uint8Array>>parts.generateAsync({ type: "uint8array"}) 
-                            })
-                            .then(partsBytesNew => {
-                                console.log(partsBytes.byteLength);
-                                console.log(partsBytesNew.byteLength);
+                    })
+                    .then(parts => {
+                        return <Promise<Uint8Array>>parts.generateAsync({ type: "uint8array" })
+                    })
+                    .then(partsBytesNew => {
+                        console.log(partsBytes.byteLength);
+                        console.log(partsBytesNew.byteLength);
 
-                                let mashupBufferNew = new ArrayBuffer(8 + partsBytesNew.byteLength + otherBytesView.byteLength);
-                                let headerNewView = new Int32Array(mashupBufferNew, 0, 2);
-                                let partsBytesNewView = new Uint8Array(mashupBufferNew, 8, partsBytesNew.byteLength);
-                                let otherBytesNewView = new Uint8Array(mashupBufferNew, 1 + 8 + otherBytesView.byteLength)
+                        let mashupBufferNew = new ArrayBuffer(8 + partsBytesNew.byteLength + otherBytesView.byteLength);
+                        let headerNewView = new Int32Array(mashupBufferNew, 0, 2);
+                        let partsBytesNewView = new Uint8Array(mashupBufferNew, 8, partsBytesNew.byteLength);
+                        let otherBytesNewView = new Uint8Array(mashupBufferNew, 1 + 8 + otherBytesView.byteLength)
 
-                                headerNewView[0] = 0;
-                                headerNewView[1] = partsBytesNew.byteLength;
-                                for (let i = 0; i < partsBytesNew.byteLength; i++){
-                                    partsBytesNewView[i] = partsBytesNew[i];
-                                }
-                                for (let i = 0; i < otherBytesNewView.byteLength; i++) {
-                                    otherBytesNewView[i] = otherBytesNewView[i];
-                                }
+                        headerNewView[0] = 0;
+                        headerNewView[1] = partsBytesNew.byteLength;
+                        for (let i = 0; i < partsBytesNew.byteLength; i++) {
+                            partsBytesNewView[i] = partsBytesNew[i];
+                        }
+                        for (let i = 0; i < otherBytesNewView.byteLength; i++) {
+                            otherBytesNewView[i] = otherBytesNewView[i];
+                        }
 
-                                pbit.remove("DataMashup")
-                                pbit.file("DataMashup", mashupBufferNew);
-                                return pbit;
-                            });
+                        return mashupBufferNew;
                     });
             })
-            .then(pbit => {
-                return <Promise<Blob>>pbit.generateAsync({ type: "blob"}) 
-            })
-            .then(blob => {
-                saveAs(blob, "hello.pbit"); 
+            .then(mashupBufferNew => {
+                pbit.remove("DataMashup")
+                pbit.file("DataMashup", mashupBufferNew);
+                return pbit;
             });
-    }, (jqHXR, status, error) => {
-        console.log(error);
+    })
+    .then(pbit => {
+        return <Promise<Blob>>pbit.generateAsync({ type: "blob" })
+    })
+    .then(blob => {
+        saveAs(blob, "hello.pbit");
+    })
+    .catch(reason => {
+        console.log("Operation failed")
     });
 
 //const greeter = new Greeter(el);
