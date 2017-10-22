@@ -49,9 +49,75 @@ export class Greeter {
 const el = document.getElementById("content");
 
 
+function ajaxAsync() {
+    return new Promise<Blob>((resolve, reject) => {
+        $.ajax({
+            url: "static/templates/Flat.pbit",
+            type: "GET",
+            dataType: "binary"
+        })
+            .done((value) => resolve(value))
+            .fail((jqXHR, textStatus, errorThrown) =>
+                reject(errorThrown instanceof Error
+                    ? errorThrown
+                    : new Error(errorThrown.toString()))
+            )
+    });
+}
+
+async function downloadAsync() {
+    try {
+        let pbitBytes = await ajaxAsync();
+        let pbitZip = await new JSZip().loadAsync(pbitBytes);
+        let mashupBuffer = await pbitZip.file("DataMashup").async("arraybuffer") as ArrayBuffer;
+
+        let headerView = new Int32Array(mashupBuffer, 0, 2);
+        let partsBytesCount = headerView[1];
+        let partsBytes = new Uint8Array(mashupBuffer, 8, 8 + partsBytesCount);
+        let otherBytesView = new Uint8Array(mashupBuffer, 1 + 8 + partsBytesCount);
+
+        let partsZip = new JSZip();
+        let parts = await partsZip.loadAsync(partsBytes)
+        let section = await parts.file("Formulas/Section1.m").async("string") as string;
+
+        section = section.replace(/stansw/, "dziala");
+        parts.remove("Formulas/Section1.m");
+        parts.file("Formulas/Section1.m", section);
+
+        let partsBytesNew = await parts.generateAsync({ type: "uint8array" });
+
+        let mashupBufferNew = new ArrayBuffer(8 + partsBytesNew.byteLength + otherBytesView.byteLength);
+        let headerNewView = new Int32Array(mashupBufferNew, 0, 2);
+        let partsBytesNewView = new Uint8Array(mashupBufferNew, 8, partsBytesNew.byteLength);
+        let otherBytesNewView = new Uint8Array(mashupBufferNew, 1 + 8 + otherBytesView.byteLength)
+
+        headerNewView[0] = 0;
+        headerNewView[1] = partsBytesNew.byteLength;
+        for (let i = 0; i < partsBytesNew.byteLength; i++) {
+            partsBytesNewView[i] = partsBytesNew[i];
+        }
+        for (let i = 0; i < otherBytesNewView.byteLength; i++) {
+            otherBytesNewView[i] = otherBytesNewView[i];
+        }
+
+        pbitZip.remove("DataMashup")
+        pbitZip.file("DataMashup", mashupBufferNew);
+
+        let pbitBytesNew = await pbitZip.generateAsync({ type: "blob" });
+
+        saveAs(pbitBytesNew, "hello.pbit");
+    } catch (exception) {
+        appInsights.trackException(exception, "sdf", { template: "Flat" });
+        console.log("Operation failed")
+    }
+}
+
+downloadAsync();
+
+
 new Promise<Blob>((resolve, reject) => {
     $.ajax({
-        url: "static/templates/Flat.pbitx",
+        url: "static/templates/Flat.pbit",
         type: "GET",
         dataType: "binary"
     })
