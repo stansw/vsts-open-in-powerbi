@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "amd",
+    "moduleResolution": "node",
+    "target": "es5",
+    "rootDir": ".",
+    "types": [
+      "vss-web-extension-sdk",
+      "mocha"
+    ]
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
