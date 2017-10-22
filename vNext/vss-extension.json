@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "vsts-open-in-powerbi-dev",
-    "version": "0.1.26",
+    "version": "0.1.39",
     "name": "Open in Power BI (Dev)",
     "public": false,
     "scopes": [
@@ -74,6 +74,18 @@
     ],
     "contributions": [
         {
+            "id": "openQueryAction",
+            "type": "ms.vss-web.action-provider",
+            "description": "Open in Power BI context menu on a query definition.",
+            "targets": [
+                "ms.vss-work-web.work-item-query-menu"
+            ],
+            "properties": {
+                "group": "contributed",
+                "uri": "index.html"
+            }
+        },
+        {
             "id": "openQueryOnToolbarAction",
             "type": "ms.vss-web.action-provider",
             "description": "Open in Power BI toolbar menu item on the query results.",
@@ -82,7 +94,7 @@
             ],
             "properties": {
                 "group": "contributed",
-                "uri": "static/index.html"
+                "uri": "static/extension.html"
             }
         },
         {
@@ -90,7 +102,7 @@
             "type": "ms.vss-web.control",
             "targets": [],
             "properties": {
-                "uri": "dialog.html"
+                "uri": "static/dialog.html"
             }
         }
     ]

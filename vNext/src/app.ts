@@ -9,37 +9,10 @@ import * as JSZip from "jszip";
 // Import file-saver and account for a bug in the type definitions.
 import * as fileSaver from "file-saver";
 
-export class Greeter {
-    element: HTMLElement;
-    span: HTMLElement;
-    timerToken: number;
+import * as WorkItemTrackingContracts from "TFS/WorkItemTracking/Contracts";
+import * as WorkItemTrackingClient from "TFS/WorkItemTracking/RestClient";
 
-    public static value = 11;
-
-    constructor(element: HTMLElement) {
-        this.element = element;
-        this.element.innerHTML += "The time is: ";
-        this.span = document.createElement("span");
-        this.element.appendChild(this.span);
-        this.span.innerText = new Date().toUTCString();
-    }
-
-    start() {
-        let a = new JSZip();
-        a.file("Hello.txt", "tralala");
-        this.timerToken = setInterval(() => this.span.innerHTML = new Date().toUTCString(), 500);
-    }
-
-    stop() {
-        clearTimeout(this.timerToken);
-    }
-
-}
-
-const el = document.getElementById("content");
-
-
-function ajaxAsync(url: string) {
+function ajaxBlobAsync(url: string): Promise<Blob> {
     return new Promise<Blob>((resolve, reject) => {
         $.ajax({
             url: url,
@@ -56,9 +29,9 @@ function ajaxAsync(url: string) {
     });
 }
 
-export async function downloadAsync() {
+export async function downloadAsync(replacement: string) {
     try {
-        let pbitBytes = await ajaxAsync("templates/Flat.pbit");
+        let pbitBytes = await ajaxBlobAsync("templates/Flat.pbit");
         let pbitZip = await new JSZip().loadAsync(pbitBytes);
         let mashupBuffer = await pbitZip.file("DataMashup").async("arraybuffer");
 
@@ -71,7 +44,7 @@ export async function downloadAsync() {
         let parts = await partsZip.loadAsync(partsBytes);
         let section = await parts.file("Formulas/Section1.m").async("string");
 
-        section = section.replace(/stansw/, "dziala");
+        section = section.replace(/stansw/, replacement);
         parts.remove("Formulas/Section1.m");
         parts.file("Formulas/Section1.m", section);
 
@@ -103,85 +76,46 @@ export async function downloadAsync() {
     }
 }
 
+interface IConfiguration {
+    close?: () => void;
+    qid: string;
+}
 
-new Promise<Blob>((resolve, reject) => {
-    $.ajax({
-        url: "templates/Flat.pbit",
-        type: "GET",
-        dataType: "binary"
-    })
-        .done((value) => resolve(value))
-        .fail((jqXHR, textStatus, errorThrown) =>
-            reject(errorThrown instanceof Error
-                ? errorThrown
-                : new Error(errorThrown.toString()))
-        );
-})
-    .then(value => {
-        let zip = new JSZip();
-        return zip.loadAsync(value);
-    })
-    .then(pbit => {
-        return pbit.file("DataMashup")
-            .async("arraybuffer")
-            .then((mashupBuffer: ArrayBuffer) => {
-                let headerView = new Int32Array(mashupBuffer, 0, 2);
-                let partsBytesCount = headerView[1];
-                let partsBytes = new Uint8Array(mashupBuffer, 8, 8 + partsBytesCount);
-                let otherBytesView = new Uint8Array(mashupBuffer, 1 + 8 + partsBytesCount);
+let configuration = VSS.getConfiguration() as IConfiguration;
+let context = VSS.getWebContext();
 
-                let partsZip = new JSZip();
-                return partsZip.loadAsync(partsBytes)
-                    .then(parts => {
-                        return parts.file("Formulas/Section1.m")
-                            .async("string")
-                            .then((section: string) => {
-                                section = section.replace(/stansw/, "dziala");
-                                parts.remove("Formulas/Section1.m");
-                                parts.file("Formulas/Section1.m", section);
-                                return parts;
-                            });
-                    })
-                    .then(parts => {
-                        return <Promise<Uint8Array>>parts.generateAsync({ type: "uint8array" });
-                    })
-                    .then(partsBytesNew => {
-                        console.log(partsBytes.byteLength);
-                        console.log(partsBytesNew.byteLength);
 
-                        let mashupBufferNew = new ArrayBuffer(8 + partsBytesNew.byteLength + otherBytesView.byteLength);
-                        let headerNewView = new Int32Array(mashupBufferNew, 0, 2);
-                        let partsBytesNewView = new Uint8Array(mashupBufferNew, 8, partsBytesNew.byteLength);
-                        let otherBytesNewView = new Uint8Array(mashupBufferNew, 1 + 8 + otherBytesView.byteLength);
+let counter = 10;
+let counterId = setInterval(() => {
+    counter -= 1;
+    if (counter < 0) {
+        configuration.close();
+        clearInterval(counterId);
+    }
+    else {
+        $("#countdown").text(counter);
+    }
+}, 1000);
+$("#countdown-cancel").click(() => {
+    clearInterval(counterId);
+    $("#countdown-message").hide();
+});
 
-                        headerNewView[0] = 0;
-                        headerNewView[1] = partsBytesNew.byteLength;
-                        for (let i = 0; i < partsBytesNew.byteLength; i++) {
-                            partsBytesNewView[i] = partsBytesNew[i];
-                        }
-                        for (let i = 0; i < otherBytesNewView.byteLength; i++) {
-                            otherBytesNewView[i] = otherBytesNewView[i];
-                        }
+async function tralala() {
+    let workItemTrackingClient = WorkItemTrackingClient.getClient();
+    let query = await workItemTrackingClient.getQuery(context.project.name, configuration.qid);
 
-                        return mashupBufferNew;
-                    });
-            })
-            .then(mashupBufferNew => {
-                pbit.remove("DataMashup");
-                pbit.file("DataMashup", mashupBufferNew);
-                return pbit;
-            });
-    })
-    .then(pbit => {
-        return <Promise<Blob>>pbit.generateAsync({ type: "blob" });
-    })
-    .then(blob => {
-        fileSaver.saveAs(blob, "hello.pbit");
-    })
-    .catch(reason => {
-        AppInsights.trackException(reason, "sdf", { template: "Flat" });
-        console.log("Operation failed");
-    });
+    let url = "templateUrl"
+        + WorkItemTrackingContracts.QueryType[query.queryType]
+        + "?" + $.param({
+            hostUrl: context.host.uri,
+            projectName: context.project.name,
+            teamName: context.team.name,
+            queryId: configuration.qid,
+            queryName: query.name
+        });
 
-// const greeter = new Greeter(el);
-// greeter.start();
+    downloadAsync(url);
+}
+
+tralala();

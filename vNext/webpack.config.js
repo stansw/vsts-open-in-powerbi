@@ -4,7 +4,8 @@ var webpack = require("webpack");
 module.exports = {
     target: "web",
     entry: {
-        extension: "./src/extension.ts"
+        extension: "./src/extension.ts",
+        app: "./src/app.ts"
     },
     output: {
         filename: "[name].bundle.js",
@@ -27,15 +28,15 @@ module.exports = {
     },
     module: {
         rules: [
-            // {
-            //     test: /\.tsx?$/,
-            //     enforce: "pre",
-            //     loader: "tslint-loader",
-            //     options: {
-            //         emitErrors: true,
-            //         failOnHint: true
-            //     }
-            // },
+            {
+                test: /\.tsx?$/,
+                enforce: "pre",
+                loader: "tslint-loader",
+                options: {
+                    emitErrors: true,
+                    failOnHint: true
+                }
+            },
             {
                 test: /\.tsx?$/,
                 loader: "ts-loader"
