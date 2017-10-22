@@ -3,6 +3,7 @@
     "build": "npm run lint && npm run clean && npm run webpack",
     "test": "karma start karma.conf.js",
     "webpack": "webpack --progress --colors --config webpack.config.js --output-path ./dist -p --verbose",
+    "dev-server": "dev-server",
     "postbuild": "npm run package",
     "package": "tfx extension create  --rev-version",
     "gallery-publish": "tfx extension publish --rev-version",

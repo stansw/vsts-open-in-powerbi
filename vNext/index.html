@@ -10,15 +10,14 @@
     
 
     <!-- Standard scripts used in the extension  -->
-    <script src="out/lib/ai.0.js"></script>
-    <script src="out/lib/VSS.SDK.min.js"></script>
+    <script src="node_modules/applicationinsights-js/dist/ai.0.js"></script>
+    <script src="node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js"></script>
     <script>
         require.config({
             paths: {
                 //'telemetryclient-team-services-extension': 'out/lib/telemetryclient',
                 //'applicationinsights-js': 'out/lib/ai.0',
                 'jszip': 'out/lib/jszip.min',
-                //'file-saver': 'out/lib/FileSaver.min'
                 'app': 'dist/app.bundle'
             }
         });
