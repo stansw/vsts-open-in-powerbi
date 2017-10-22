@@ -5,8 +5,6 @@ var TEST_REGEXP = /(spec|test)\.js$/i
 Object.keys(window.__karma__.files).forEach(function (file) {
   if (TEST_REGEXP.test(file)) {
     // Normalize paths to RequireJS module names.
-    // If you require sub-dependencies of test files to be loaded as-is (requiring file extension)
-    // then do not normalize the paths
     var normalizedTestModule = file.replace(/^\/base\/|\.js$/g, '')
     allTestFiles.push(normalizedTestModule)
   }
@@ -18,8 +16,8 @@ require.config({
 
   paths: {
     'chai': 'node_modules/chai/chai',
-    'telemetryclient-team-services-extension': 'node_modules/telemetryclient-team-services-extension/lib/telemetryclient',
-    'applicationinsights-js': 'node_modules/applicationinsights-js/dist/ai'
+    'telemetryclient-team-services-extension': 'out/src/telemetryclient',
+    'applicationinsights-js': 'out/src/ai.0'
   },
 
   // dynamically load all test files

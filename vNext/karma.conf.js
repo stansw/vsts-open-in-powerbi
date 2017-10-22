@@ -16,10 +16,7 @@ module.exports = function (config) {
     // list of files / patterns to load in the browser
     files: [
       'test/test-main.js',
-      { pattern: 'out/test/**/*.js', included: false },
-      { pattern: 'out/src/**/*.js', included: false },
-      { pattern: 'node_modules/telemetryclient-team-services-extension/**/*.js', included: false },
-      { pattern: 'node_modules/applicationinsights-js/**/*.js', included: false }
+      { pattern: 'out/**/*.js', included: false }
     ],
 
 

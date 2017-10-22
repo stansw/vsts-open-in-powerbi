@@ -1,12 +1,15 @@
- /// <reference types="vss-web-extension-sdk" />
 import * as tc from "telemetryclient-team-services-extension";
 import telemetryClientSettings = require("./telemetryClientSettings");
+
+import * as zip from "jszip";
+
+
 export class Greeter {
     element: HTMLElement;
     span: HTMLElement;
     timerToken: number;
 
-    public static value = 10;
+    public static value = 11;
 
     constructor(element: HTMLElement) {
         this.element = element;
@@ -17,6 +20,8 @@ export class Greeter {
     }
 
     start() {
+        var a = new JSZip();
+        a.file("Hello.txt", "tralala");
         this.timerToken = setInterval(() => this.span.innerHTML = new Date().toUTCString(), 500);
     }
 

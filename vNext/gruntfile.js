@@ -36,13 +36,27 @@
         },
         copy: {
             scripts: {
-                files: [{
-                    expand: true,
-                    flatten: true,
-                    src: ["node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js"],
-                    dest: "build",
-                    filter: "isFile"
-                }]
+                files: [
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ["node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js"],
+                        dest: "out/src/",
+                        filter: "isFile"
+                    },
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ["node_modules/telemetryclient-team-services-extension/lib/telemetryclient.js"],
+                        dest: "out/src/"
+                    },
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ["node_modules/applicationinsights-js/dist/ai.0.js"],
+                        dest: "out/src/"
+                    }
+                ]
             }
         },
 
