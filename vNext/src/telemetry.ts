@@ -14,7 +14,7 @@ ai.AppInsights.downloadAndSetup({ instrumentationKey: "478f349e-1267-43eb-a2aa-b
 
 let webContext = VSS.getWebContext();
 if (webContext) {
-    appInsights.setAuthenticatedUserContext(webContext.user.id, webContext.collection.id);
+    appInsights.setAuthenticatedUserContext(webContext.user.id, webContext.account.name);
 }
 
 export let AppInsights = ai.AppInsights;
