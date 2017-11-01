@@ -2,5 +2,6 @@
     "id": "vsts-open-in-powerbi",
     "name": "Open in Power BI",
     "public": true,
-    "version": "0.2.0"
+    "version": "0.2.0",
+    "baseUri": null
 }

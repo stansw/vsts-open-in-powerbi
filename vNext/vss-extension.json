@@ -1,9 +1,10 @@
 {
     "manifestVersion": 1,
     "id": "vsts-open-in-powerbi-dev",
-    "version": "0.1.39",
+    "version": "0.1.54",
     "name": "Open in Power BI (Dev)",
     "public": false,
+    "baseUri": "https://localhost:8081/",
     "scopes": [
         "vso.work"
     ],
@@ -82,7 +83,7 @@
             ],
             "properties": {
                 "group": "contributed",
-                "uri": "index.html"
+                "uri": "static/extension.html"
             }
         },
         {

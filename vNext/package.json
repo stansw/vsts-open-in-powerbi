@@ -5,10 +5,10 @@
     "test": "karma start karma.conf.js",
     "webpack": "webpack --progress --colors --config webpack.config.js -p --verbose",
     "webpack-dev": "webpack --progress --colors --config webpack.config.js -d --verbose",
-    "dev-server": "webpack-dev-server",
+    "dev-server": "webpack-dev-server --https",
     "package": "tfx extension create --rev-version --output-path visx",
     "publish": "tfx extension publish --rev-version --output-path visx",
-    "package-prod": "tfx extension create --output-path visx ",
+    "package-prod": "tfx extension create --output-path visx --overrides-file vss-extension.prod.json",
     "publish-prod": "tfx extension publish --output-path visx --overrides-file vss-extension.prod.json",
     "clean": "rimraf ./out",
     "lint": "tslint -c tslint.json 'src/*.ts'"
