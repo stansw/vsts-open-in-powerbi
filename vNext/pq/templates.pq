@@ -223,12 +223,16 @@
             #"Check queryType" = if query[queryType]? = "flat"
                 then query
                 else error Error.Record("Error", 
-                    "Query was updated and does not return result of type ""Flat list of work items"". Please generate this file again."),
+                    "Query was updated and does not return result of type ""Flat list of work items"". Please generate this file again.")
+        in
+            WiqlRunFlatQueryCore(contents, url, scope, query, options),
 
+    WiqlRunFlatQueryCore = (contents as function, url as text, scope as record, query as record, optional options as record) =>
+        let
             #"Get fields" = List.Distinct(
                 { "System.Id", "System.Title", "System.WorkItemType" }
-                & List.Transform(#"Check queryType"[columns], each [referenceName])),
-            #"Get ids" = List.Transform(Record.FieldOrDefault(#"Check queryType", "workItems", {}), each [id]),
+                & List.Transform(query[columns], each [referenceName])),
+            #"Get ids" = List.Transform(Record.FieldOrDefault(query, "workItems", {}), each [id]),
             #"Get table" = GetWorkItemFieldValues(contents, url, scope, #"Get ids", #"Get fields", options),
 
             #"Add Index" = Table.AddIndexColumn(#"Get table", "Index", 1, 1),
@@ -245,9 +249,10 @@
 
     WiqlRunTreeQuery = (contents as function, url as text, scope as record, query as record, optional options as record) =>
         let
-            #"Check queryType" = if query[queryType] = "tree"
+            #"Check queryType" = if query[queryType]? = "tree" and query[queryResultType]? = "workItemLink"
                 then query
-                else error Error.Record("Error", "Query was updated and does not return result of type ""Tree of work items"". Please generate this file again."),
+                else error Error.Record("Error", 
+                    "Query was updated and does not return result of type ""Tree of work items"". Please generate this file again."),
 
             #"Get relations" = #"Check queryType"[workItemRelations],
             #"Convert to table" = Table.FromList(#"Get relations", Splitter.SplitByNothing(), { "Record" }, null, ExtraValues.Error),
@@ -268,19 +273,39 @@
         in
             #"Remove Target ID",
 
-    WiqlRunOneHopQueryById = (contents as function, url as text, scope as record, id as text, optional options as record) as table =>
+    WiqlRunOneHopWorkItemQueryById = (contents as function, url as text, scope as record, id as text, optional options as record) as table =>
         let
             #"Get query" = WiqlQueryById(contents, scope, id),
-            #"Get table" = WiqlRunOneHopQuery(contents, url, scope, #"Get query", options)
+            #"Get table" = WiqlRunOneHopWorkItemQuery(contents, url, scope, #"Get query", options)
         in
             #"Get table",
 
-    WiqlRunOneHopQuery = (contents as function, url as text, scope as record, query as record, optional options as record) as table =>
+    WiqlRunOneHopWorkItemQuery = (contents as function, url as text, scope as record, query as record, optional options as record) as table =>
         let
-            #"Check queryType" = if query[queryType]? = "oneHop"
+            #"Check queryType" = if query[queryType]? = "oneHop" and query[queryResultType]? = "workItem"
                 then query
                 else error Error.Record("Error", 
-                    "Query was updated and does not return result of type ""Work items and direct links"". Please generate this file again."),
+                    "Query was updated and its configuration no longer matches ""Work items and direct links"""
+                    & " and ""Only return items that do not have matching links""."
+                    & " Please generate this file again.")
+        in
+            WiqlRunFlatQueryCore(contents, url, scope, query, options),
+
+    WiqlRunOneHopWorkItemLinkQueryById = (contents as function, url as text, scope as record, id as text, optional options as record) as table =>
+        let
+            #"Get query" = WiqlQueryById(contents, scope, id),
+            #"Get table" = WiqlRunOneHopWorkItemLinkQuery(contents, url, scope, #"Get query", options)
+        in
+            #"Get table",
+
+    WiqlRunOneHopWorkItemLinkQuery = (contents as function, url as text, scope as record, query as record, optional options as record) as table =>
+        let
+            #"Check queryType" = if query[queryType]? = "oneHop" and query[queryResultType]? = "workItemLink"
+                then query
+                else error Error.Record("Error", 
+                    "Query was updated and its configuration no longer matches ""Work items and direct links"""
+                    & " and ""Return all top level items"" or ""Only return items that have matching links""."
+                    & " Please generate this file again."),
 
             #"Get relations" = #"Check queryType"[workItemRelations],
             #"Convert to table" = Table.FromList(#"Get relations", Splitter.SplitByNothing(), { "Record" }, null, ExtraValues.Error),
@@ -308,14 +333,18 @@
         let
             #"Get query" = WiqlQueryById(contents, scope, id),
             #"Get table" = 
-                if #"Get query"[queryType]? = "flat"
+                if #"Get query"[queryType]? = "flat" and #"Get query"[queryResultType]? = "workItem"
                     then WiqlRunFlatQuery(contents, url, scope, #"Get query", options)
-                else if #"Get query"[queryType]? = "oneHop"
-                    then WiqlRunOneHopQuery(contents, url, scope, #"Get query", options)
-                else if #"Get query"[queryType]? = "tree"
+                else if #"Get query"[queryType]? = "oneHop" and #"Get query"[queryResultType]? = "workItemLink"
+                    then WiqlRunOneHopWorkItemLinkQuery(contents, url, scope, #"Get query", options)
+                else if #"Get query"[queryType]? = "oneHop" and #"Get query"[queryResultType]? = "workItem"
+                    then WiqlRunOneHopWorkItemQuery(contents, url, scope, #"Get query", options)
+                else if #"Get query"[queryType]? = "tree" and #"Get query"[queryResultType]? = "workItemLink"
                     then WiqlRunTreeQuery(contents, url, scope, #"Get query", options)
                  else error Error.Record("Error", 
-                    "Query type is not supported")
+                     "Query configuration is not supported: " 
+                         & Text.From(#"Get query"[queryType]?) 
+                         & " + " & Text.From(#"Get query"[queryResultType]?))
         in
             #"Get table",
 
@@ -323,7 +352,9 @@
         WiqlRunQueryById = WiqlRunQueryById,
         WiqlRunFlatQueryById = WiqlRunFlatQueryById,
         WiqlRunTreeQueryById = WiqlRunTreeQueryById,
-        WiqlRunOneHopQueryById = WiqlRunOneHopQueryById
+        WiqlRunOneHopWorkItemQueryById = WiqlRunOneHopWorkItemQueryById,
+        WiqlRunOneHopWorkItemLinkQueryById = WiqlRunOneHopWorkItemLinkQueryById
+
     ]
 in
 let 
