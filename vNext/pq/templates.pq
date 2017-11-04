@@ -111,8 +111,7 @@
 
     WiqlQueryById = (contents as function, scope as record, id as text) =>
         let
-            #"Format relative path" = (if scope[Collection]? <> null then "/" & Uri.EscapeDataString(scope[Collection]) else "")
-                & (if scope[Project]? <> null then "/" & Uri.EscapeDataString(scope[Project]) else "")
+            #"Format relative path" = FormatTeamPath(scope)
                 & "/_apis/wit/wiql/" & Uri.EscapeDataString(id) 
                 & "?api-version=1.0",
             #"Get result" = Json.Document(WiqlContents(contents, [RelativePath = #"Format relative path"]))
@@ -120,9 +119,22 @@
             #"Get result",
 
     FormatCollectionPath = (scope as record) as text => 
-        if scope[Collection]? <> null 
-            then Uri.EscapeDataString(scope[Collection]) 
+        if Text.Length(Record.FieldOrDefault(scope, "Collection", "")) > 0
+            then "/" & Uri.EscapeDataString(scope[Collection])
             else "",
+
+    FormatProjectPath = (scope as record) as text =>
+        FormatCollectionPath(scope)
+        & (if Text.Length(Record.FieldOrDefault(scope, "Project", "")) > 0 
+            then "/" & Uri.EscapeDataString(scope[Project])
+            else ""),
+
+    FormatTeamPath = (scope as record) as text =>
+        FormatProjectPath(scope)
+        & (if Text.Length(Record.FieldOrDefault(scope, "Project", "")) > 0 
+            and Text.Length(Record.FieldOrDefault(scope, "Team", "")) > 0 
+            then "/" & Uri.EscapeDataString(scope[Team])
+            else ""),
 
     GetWorkItemFieldValuesAsRecords = 
         (
@@ -134,17 +146,17 @@
         ) 
         as list => 
         let
-            collection = Record.FieldOrDefault(scope, "Collection", "DefaultCollection"),
             fieldsQueryString = if (fields <> null and List.Count(fields) <= MaxFieldsCount) 
                 then "&fields=" & Text.Combine(fields, ",")
                 else "",
-            
-            #"Format field definitions path" = FormatCollectionPath(scope) & "/_apis/wit/workitems?api-version=1.0" & fieldsQueryString,
+            fieldDefinitionPath = FormatCollectionPath(scope) 
+                & "/_apis/wit/workitems?api-version=1.0" 
+                & fieldsQueryString,
             workItemIdsBatches = Batch(ids, BatchSize),
             workItemIdsBatchQueryStrings = List.Transform(workItemIdsBatches,
                 each "&ids=" & Text.Combine(List.Transform(_, Number.ToText), ",")),
             fieldValues = List.TransformMany(workItemIdsBatchQueryStrings,
-                each Json.Document(WiqlContents(contents, [RelativePath = #"Format field definitions path" & _]))[value],
+                each Json.Document(WiqlContents(contents, [RelativePath = fieldDefinitionPath & _]))[value],
                 (batch, _) => _)
         in
             fieldValues,
