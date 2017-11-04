@@ -65,7 +65,7 @@
     /// </summary>
     ContentsWithErrorUnwrapping = (contents as function, optional options as record) as binary =>
         let
-            #"Get system status codes" = { 400, 429, 500, 503 },
+            #"Get system status codes" = { 400, 429, 500, 503, 203 },
 
             #"Get options" = if options <> null then options else [],
             #"Get relative path" = Record.FieldOrDefault(#"Get options", "RelativePath", ""),
@@ -82,8 +82,10 @@
                 otherwise try [message = Text.FromBinary(#"Buffer contents")] 
                 otherwise [],
             #"Get result" = if List.Contains(#"Get handled status codes", #"Get status code")
-                then error Error.Record("Error",
-                    Record.FieldOrDefault(#"Get error", "message", "Failed to get contents from relative path'" & #"Get relative path" & "' (" & Number.ToText(#"Get status code") & ")" ),
+                    then error Error.Record("Error",
+                        if #"Get status code" <> 203
+                            then Record.FieldOrDefault(#"Get error", "message", "Failed to get contents from relative path'" & #"Get relative path" & "' (" & Number.ToText(#"Get status code") & ")" )
+                            else "The credentials provided are invalid. Please update the credential type through a refresh or in the Data Source Settings dialog to continue.",
                     [
                         DataSourceKind = "Web.Contents", 
                         ActivityId = Diagnostics.ActivityId(),
