@@ -1,21 +1,20 @@
 let
-    url = "http://localhost:8080/tfs",
-    collection = "DefaultCollection",
-    project = "proj1",
-    team = "",
-    id = "e92fecdd-fe23-4b3f-a838-1152ed54f207",
- 
-    // Create wrapper for Web.Contents function as a workaround for the static code analysis in Power BI Service.
-    contents = (options) => Web.Contents(
+    url = "https://stansw.visualstudio.com", 
+    collection = "",
+    project = "vsts-open-in-powerbi",
+    team = "vsts-open-in-powerbi Team",
+    id = "d5349265-9c9d-4808-933a-c3d27b731657",
+
+    // Create wrapper for VSTS.Contents function as a workaround for the static code analysis in Power BI Service.
+    contents = (o) => VSTS.Contents(
         url, 
         [ 
-            ExcludedFromCacheKey = Record.FieldOrDefault(options, "ExcludedFromCacheKey", {}),
-            Headers              = Record.FieldOrDefault(options, "Headers", []),
-            IsRetry              = Record.FieldOrDefault(options, "IsRetry", false),
-            ManualStatusHandling = Record.FieldOrDefault(options, "ManualStatusHandling", {}),
-            Query                = Record.FieldOrDefault(options, "Query", []),
-            RelativePath         = Record.FieldOrDefault(options, "RelativePath", null),
-            Timeout              = Record.FieldOrDefault(options, "Timeout", null)
+            Version              = Record.FieldOrDefault(Record.FieldOrDefault(o, "Headers", []), "Referer", ""),
+            IsRetry              = Record.FieldOrDefault(o, "IsRetry", false),
+            ManualStatusHandling = Record.FieldOrDefault(o, "ManualStatusHandling", {}),
+            Query                = Record.FieldOrDefault(o, "Query", []),
+            RelativePath         = Record.FieldOrDefault(o, "RelativePath", null),
+            Timeout              = Record.FieldOrDefault(o, "Timeout", null)
        ]),
 
     Source = Functions[WiqlRunQueryById](contents, url, [Collection = collection, Project = project, Team = team], id)

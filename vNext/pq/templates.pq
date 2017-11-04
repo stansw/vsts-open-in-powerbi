@@ -299,7 +299,7 @@ let
                     & " and ""Only return items that do not have matching links""."
                     & " Please generate this file again.")
         in
-            WiqlRunFlatWorkItemQueryCore(contents, url, scope, query, options),
+            WiqlRunFlatWorkItemQueryCore(contents, url, scope, #"Check queryType", options),
 
     WiqlRunOneHopWorkItemLinkQueryById = (contents as function, url as text, scope as record, id as text, optional options as record) as table =>
         let

@@ -17,39 +17,6 @@ let
 
     Text.FromHtml = (value as nullable text) as nullable text =>
         value,
-// This section is commented out because Web.Page function is not supported in Power BI Service
-// and it forces users to install Power BI Personal Gateway which is a significant effort.
-//        let
-//            lines = if Web.Page <> null
-//                then Text.FromHtmlRec(Web.Page(value){0}[Data])
-//                else { value },
-//            result = if value <> null
-//                then Text.Combine(lines)
-//                else null
-//        in
-//            result,
-//
-//    Text.FromHtmlRec = (nodesTable as table) as list =>
-//        let
-//            nodes = Table.ToRecords(nodesTable),
-//            lines = List.TransformMany(nodes,
-//                (n) =>
-//                    let
-//                        text = if n[Text]? <> null then { n[Text] } else {},
-//                        children = if n[Children]? <> null then @Text.FromHtmlRec(n[Children]) else {},
-//                        br = if n[Name]? = "P" or n[Name]? = "BR" 
-//                            then { "#(lf)" }
-//                            else if n[Name]? = "DIV"
-//                                then if n[Children]? <> null and Table.RowCount(n[Children]) = 1 and n[Children]{0}[Name] = "BR"
-//                                    then {}
-//                                    else { "#(lf)" }
-//                                else {},
-//                        lines = List.Combine({ text, children, br })
-//                    in
-//                        lines,
-//                (n, t) => t)
-//        in
-//            lines,
 
     Batch = (items as list, batchSize as number) as list =>
         List.Generate(
@@ -289,7 +256,7 @@ let
                     & " and ""Only return items that do not have matching links""."
                     & " Please generate this file again.")
         in
-            WiqlRunFlatWorkItemQueryCore(contents, url, scope, query, options),
+            WiqlRunFlatWorkItemQueryCore(contents, url, scope, #"Check queryType", options),
 
     WiqlRunOneHopWorkItemLinkQueryById = (contents as function, url as text, scope as record, id as text, optional options as record) as table =>
         let
