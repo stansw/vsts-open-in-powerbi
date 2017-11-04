@@ -1,3 +1,5 @@
+import "../static/css/app.css";
+
 // https://github.com/Microsoft/TypeScript/issues/4717
 import "jquery-binarytransport"; // Load for side effects
 

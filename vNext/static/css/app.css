@@ -5,3 +5,7 @@ body {
 span {
     font-style: italic;
 }
+
+.powerbi_logo_16x16 {
+    background-image: url('../images/powerbi_logo_16x16.png')
+}

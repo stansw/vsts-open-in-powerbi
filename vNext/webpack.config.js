@@ -40,7 +40,15 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 loader: "ts-loader"
+            },
+            {
+                test: /\.(png|jpg)$/,
+                loader: 'url-loader'
+            },
+            {
+                test: /\.css$/,
+                loader: 'style-loader!css-loader'
             }
-        ]
+        ],
     }
 }
