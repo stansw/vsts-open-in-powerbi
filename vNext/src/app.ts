@@ -64,8 +64,8 @@ async function transformDataMashupAsync(data: Blob, transform: (section: string)
 
     let headerView = new Int32Array(mashupBuffer, 0, 2);
     let partsBytesCount = headerView[1];
-    let partsBytes = new Uint8Array(mashupBuffer, 8, 8 + partsBytesCount);
-    let otherBytesView = new Uint8Array(mashupBuffer, 1 + 8 + partsBytesCount);
+    let partsBytes = new Uint8Array(mashupBuffer, 8, partsBytesCount);
+    let otherBytesView = new Uint8Array(mashupBuffer, 8 + partsBytesCount);
 
     let partsZip = new JSZip();
     let parts = await partsZip.loadAsync(partsBytes);
@@ -85,7 +85,7 @@ async function transformDataMashupAsync(data: Blob, transform: (section: string)
     let mashupBufferNew = new ArrayBuffer(8 + partsBytesNew.byteLength + otherBytesView.byteLength);
     let headerNewView = new Int32Array(mashupBufferNew, 0, 2);
     let partsBytesNewView = new Uint8Array(mashupBufferNew, 8, partsBytesNew.byteLength);
-    let otherBytesNewView = new Uint8Array(mashupBufferNew, 1 + 8 + partsBytesNew.byteLength, otherBytesView.length);
+    let otherBytesNewView = new Uint8Array(mashupBufferNew, 8 + partsBytesNew.byteLength, otherBytesView.length);
 
     // Copy bytes to account for any change in the length.
     headerNewView[0] = 0;
