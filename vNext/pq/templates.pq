@@ -9,15 +9,20 @@ let
     BatchSize = 200,
     MaxFieldsCount = 100,
     MashupTypeMap = [
-        boolean = type logical,
-        dateTime = type datetime,
-        double = type number,
-        history = type text,
-        html = type text,
-        integer = Int64.Type,
-        plainText = type text,
         string = type text,
-        treePath = type text
+        integer = Int64.Type,
+        dateTime = type datetime,
+        plainText = type text,
+        html = type text,
+        treePath = type text,
+        history = type text,
+        double = type number,
+        guid = type text,
+        boolean = type logical,
+        identity = type text,
+        picklistString = type text,
+        picklistInteger = Int64.Type,
+        picklistDouble = type number
     ],
 
     Text.FromHtml = (value as nullable text) as nullable text =>
@@ -191,7 +196,7 @@ let
             #"Get field definitions" = Json.Document(WiqlContents(contents, [RelativePath = #"Format field definitions path"])),
             #"Convert field definitions to table" = Table.FromRecords(#"Get field definitions"[value]),
             #"Select relevant fields" = Table.SelectRows(#"Convert field definitions to table", each List.Contains(fields, [referenceName])),
-            #"Add addMashupType" = Table.AddColumn(#"Select relevant fields", "mashupType", each Record.Field(MashupTypeMap, [type])),
+            #"Add addMashupType" = Table.AddColumn(#"Select relevant fields", "mashupType", each Record.FieldOrDefault(MashupTypeMap, [type], type any)),
 
             #"Convert fields to table" = Table.FromList(List.Transform(#"Get field records", each [fields]), Splitter.SplitByNothing(), { "Records" }, null, ExtraValues.Error),
             #"Expand fields records" = Table.ExpandRecordColumn(#"Convert fields to table", "Records", fields, fields),
