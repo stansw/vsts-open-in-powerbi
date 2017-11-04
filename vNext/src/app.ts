@@ -58,9 +58,8 @@ function ajaxBlobAsync(url: string): Promise<Blob> {
     });
 }
 
-async function createFromTemplateAsync(url: string, transform: (section: string) => string): Promise<Blob> {
-    let pbitBytes = await ajaxBlobAsync(url);
-    let pbitZip = await new JSZip().loadAsync(pbitBytes);
+async function transformDataMashupAsync(data: Blob, transform: (section: string) => string): Promise<Blob> {
+    let pbitZip = await new JSZip().loadAsync(data);
     let mashupBuffer = await pbitZip.file("DataMashup").async("arraybuffer");
 
     let headerView = new Int32Array(mashupBuffer, 0, 2);
@@ -108,6 +107,8 @@ async function createFromTemplateAsync(url: string, transform: (section: string)
 export async function mainAsync() {
     try {
         let context = VSS.getWebContext();
+        let hosted = context.account.name !== "TEAM FOUNDATION"
+            && context.account.name !== "Team Foundation Server";
         let workItemTrackingClient = WorkItemTrackingClient.getClient();
         let query = await workItemTrackingClient.getQuery(
             context.project.name,
@@ -138,9 +139,12 @@ export async function mainAsync() {
                 AppInsights.startTrackEvent(scenario);
 
                 let transform = (section) => {
+                    // Skip collection when running in hosted deployment.
+                    let collection = hosted ? "" : context.collection.name;
+                    // Define replacements for all parameters.
                     let replacements = {
                         '    url = "[^"]*",': `    url = "${context.host.uri}",`,
-                        '    collection = "[^"]*",': `    collection = "${context.collection.name}",`,
+                        '    collection = "[^"]*",': `    collection = "${collection}",`,
                         '    project = "[^"]*",': `    project = "${context.project.name}",`,
                         '    team = "[^"]*",': `    team = "${context.team.name}",`,
                         '    id = "[^"]*",': `    id = "${configuration.queryId}",`
@@ -151,8 +155,10 @@ export async function mainAsync() {
                     return section;
                 };
 
-                let data = await createFromTemplateAsync(`templates/${queryType}.pbit`, transform);
-                fileSaver.saveAs(data, `${query.name}.pbit`);
+                let deployment = hosted ? "Hosted" : "OnPremise";
+                let templateBytes = await ajaxBlobAsync(`templates/${queryType}.${queryMode}.${deployment}.pbit`);
+                let updatedBytes = await transformDataMashupAsync(templateBytes, transform);
+                fileSaver.saveAs(updatedBytes, `${query.name}.pbit`);
                 success = true;
             } catch (exception) {
                 AppInsights.trackException(exception, null, traceData);
