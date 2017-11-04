@@ -135,12 +135,11 @@ export async function mainAsync() {
                 AppInsights.startTrackEvent(scenario);
 
                 let transform = (section) => {
-                    // Skip collection when running in hosted deployment.
-                    let collection = hosted ? "" : context.collection.name;
-                    // Define replacements for all parameters.
                     let replacements = {
-                        '    url = "[^"]*",': `    url = "${context.host.uri}",`,
-                        '    collection = "[^"]*",': `    collection = "${collection}",`,
+                        // Do not include trailing forward slash in the URL.
+                        '    url = "[^"]*",': `    url = "${context.host.uri.replace(/\/$/, "")}",`,
+                        // Define replacements for all parameters.
+                        '    collection = "[^"]*",': `    collection = "${hosted ? "" : context.collection.name}",`,
                         '    project = "[^"]*",': `    project = "${context.project.name}",`,
                         '    team = "[^"]*",': `    team = "${context.team.name}",`,
                         '    id = "[^"]*",': `    id = "${configuration.queryId}",`
