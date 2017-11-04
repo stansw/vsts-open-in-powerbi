@@ -151,7 +151,7 @@ export async function mainAsync() {
                     return section;
                 };
 
-                let deployment = hosted ? "Hosted" : "OnPremise";
+                let deployment = hosted ? "VSTS" : "TFS";
                 let templateBytes = await ajaxBlobAsync(`templates/${queryType}.${queryMode}.${deployment}.pbit`);
                 let updatedBytes = await transformDataMashupAsync(templateBytes, transform);
                 fileSaver.saveAs(updatedBytes, `${query.name}.pbit`);

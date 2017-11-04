@@ -1,8 +1,3 @@
-﻿let
-    Functions = 
-// ----------------------------------------------------------------------------
-//  Functions.VSTS.txt
-// ----------------------------------------------------------------------------
 let
     Referer = "vsts-open-in-powerbi/2.0.0",
     
@@ -21,40 +16,37 @@ let
     ],
 
     Text.FromHtml = (value as nullable text) as nullable text =>
-        value,
-// This section is commented out because Web.Page function is not supported in Power BI Service
-// and it forces users to install Power BI Personal Gateway which is a significant effort.
-//        let
-//            lines = if Web.Page <> null
-//                then Text.FromHtmlRec(Web.Page(value){0}[Data])
-//                else { value },
-//            result = if value <> null
-//                then Text.Combine(lines)
-//                else null
-//        in
-//            result,
-//
-//    Text.FromHtmlRec = (nodesTable as table) as list =>
-//        let
-//            nodes = Table.ToRecords(nodesTable),
-//            lines = List.TransformMany(nodes,
-//                (n) =>
-//                    let
-//                        text = if n[Text]? <> null then { n[Text] } else {},
-//                        children = if n[Children]? <> null then @Text.FromHtmlRec(n[Children]) else {},
-//                        br = if n[Name]? = "P" or n[Name]? = "BR" 
-//                            then { "#(lf)" }
-//                            else if n[Name]? = "DIV"
-//                                then if n[Children]? <> null and Table.RowCount(n[Children]) = 1 and n[Children]{0}[Name] = "BR"
-//                                    then {}
-//                                    else { "#(lf)" }
-//                                else {},
-//                        lines = List.Combine({ text, children, br })
-//                    in
-//                        lines,
-//                (n, t) => t)
-//        in
-//            lines,
+        let
+            lines = if Web.Page <> null
+                then Text.FromHtmlRec(Web.Page(value){0}[Data])
+                else { value },
+            result = if value <> null
+                then Text.Combine(lines)
+                else null
+        in
+            result,
+
+    Text.FromHtmlRec = (nodesTable as table) as list =>
+        let
+            nodes = Table.ToRecords(nodesTable),
+            lines = List.TransformMany(nodes,
+                (n) =>
+                    let
+                        text = if n[Text]? <> null then { n[Text] } else {},
+                        children = if n[Children]? <> null then @Text.FromHtmlRec(n[Children]) else {},
+                        br = if n[Name]? = "P" or n[Name]? = "BR" 
+                            then { "#(lf)" }
+                            else if n[Name]? = "DIV"
+                                then if n[Children]? <> null and Table.RowCount(n[Children]) = 1 and n[Children]{0}[Name] = "BR"
+                                    then {}
+                                    else { "#(lf)" }
+                                else {},
+                        lines = List.Combine({ text, children, br })
+                    in
+                        lines,
+                (n, t) => t)
+        in
+            lines,
 
     Batch = (items as list, batchSize as number) as list =>
         List.Generate(
@@ -361,70 +353,4 @@ let
         WiqlRunOneHopWorkItemLinkQueryById = WiqlRunOneHopWorkItemLinkQueryById
     ]
 in
-    Export,
-// ----------------------------------------------------------------------------
-    
-    Query.VSTS = 
-// ----------------------------------------------------------------------------
-//  Query.VSTS.txt
-// ----------------------------------------------------------------------------
-let
-    url = "https://stansw.visualstudio.com", 
-    collection = "",
-    project = "vsts-open-in-powerbi",
-    team = "vsts-open-in-powerbi Team",
-    id = "d5349265-9c9d-4808-933a-c3d27b731657",
-
-    // Create wrapper for VSTS.Contents function as a workaround for the static code analysis in Power BI Service.
-    contents = (o) => VSTS.Contents(
-        url, 
-        [ 
-            Version              = Record.FieldOrDefault(Record.FieldOrDefault(o, "Headers", []), "Referer", ""),
-            IsRetry              = Record.FieldOrDefault(o, "IsRetry", false),
-            ManualStatusHandling = Record.FieldOrDefault(o, "ManualStatusHandling", {}),
-            Query                = Record.FieldOrDefault(o, "Query", []),
-            RelativePath         = Record.FieldOrDefault(o, "RelativePath", null),
-            Timeout              = Record.FieldOrDefault(o, "Timeout", null)
-       ]),
-
-    Source = Functions[WiqlRunQueryById](contents, url, [Collection = collection, Project = project, Team = team], id)
-in
-    Source,
-// ----------------------------------------------------------------------------
-
-    Query.TFS = 
-// ----------------------------------------------------------------------------
-//  Query.TFS.txt
-// ----------------------------------------------------------------------------
-let
-//     url = "http://localhost:8080/tfs",
-//     collection = "DefaultCollection",
-//     project = "proj1",
-//     team = "",
-//     id = "e92fecdd-fe23-4b3f-a838-1152ed54f207",
-    url = "https://stansw.visualstudio.com", 
-    collection = "",
-    project = "vsts-open-in-powerbi",
-    team = "vsts-open-in-powerbi Team",
-    id = "d5349265-9c9d-4808-933a-c3d27b731657",
- 
-    // Create wrapper for Web.Contents function as a workaround for the static code analysis in Power BI Service.
-    contents = (options) => Web.Contents(
-        url, 
-        [ 
-            ExcludedFromCacheKey = Record.FieldOrDefault(options, "ExcludedFromCacheKey", {}),
-            Headers              = Record.FieldOrDefault(options, "Headers", []),
-            IsRetry              = Record.FieldOrDefault(options, "IsRetry", false),
-            ManualStatusHandling = Record.FieldOrDefault(options, "ManualStatusHandling", {}),
-            Query                = Record.FieldOrDefault(options, "Query", []),
-            RelativePath         = Record.FieldOrDefault(options, "RelativePath", null),
-            Timeout              = Record.FieldOrDefault(options, "Timeout", null)
-       ]),
-
-    Source = Functions[WiqlRunQueryById](contents, url, [Collection = collection, Project = project, Team = team], id)
-in
-    Source
-// ----------------------------------------------------------------------------
-
-in
-    Query.TFS
+    Export
