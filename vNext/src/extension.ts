@@ -47,13 +47,13 @@ interface IActionContext {
     columns?: string[];
 }
 
-async function openQuery(queryId: string, scenario: string) {
+async function openQuery(queryId: string, contribution: string) {
     let extensionContext = VSS.getExtensionContext();
     let dialog: IExternalDialog;
 
     let configuration = <IConfiguration>{
         queryId: queryId,
-        scenario: scenario,
+        contribution: contribution,
         close: () => dialog.close()
     };
 
@@ -93,7 +93,7 @@ export let openQueryAction = {
                 icon: "static/images/powerbi_logo_16x16.png",
                 action: (actionContext: IActionContext) => {
                     if (actionContext && actionContext.query && actionContext.query.id) {
-                        openQuery(actionContext.query.id, "ms.vss-work-web.work-item-query-menu");
+                        openQuery(actionContext.query.id, "openQueryAction");
                     }
                 }
             }];
@@ -110,7 +110,7 @@ export let openQueryOnToolbarAction = {
             showText: true,
             action: async (actionContext: IActionContext) => {
                 if (actionContext && actionContext.query && actionContext.query.wiql && isSupportedQueryId(actionContext.query.id)) {
-                    openQuery(actionContext.query.id, "ms.vss-work-web.work-item-query-results-toolbar-menu");
+                    openQuery(actionContext.query.id, "openQueryOnToolbarAction");
                 }
                 else {
                     let hostDialogService = await VSS.getService<IHostDialogService>(VSS.ServiceIds.Dialog);

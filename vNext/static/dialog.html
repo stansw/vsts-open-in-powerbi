@@ -27,6 +27,7 @@
             VSS.require(["out/app.bundle"], function (app) {
                 // Loading succeeded.
                 VSS.notifyLoadSucceeded();
+                app.mainAsync();
             });
         });
     </script>
