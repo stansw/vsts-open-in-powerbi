@@ -63,7 +63,7 @@ async function openQuery(queryId: string, contribution: string) {
         {
             title: "Downloading Power BI file...",
             width: 400,
-            height: 670,
+            height: 715,
             modal: true,
             draggable: false,
             resizable: false,
