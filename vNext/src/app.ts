@@ -85,17 +85,13 @@ async function transformDataMashupAsync(data: Blob, transform: (section: string)
     let mashupBufferNew = new ArrayBuffer(8 + partsBytesNew.byteLength + otherBytesView.byteLength);
     let headerNewView = new Int32Array(mashupBufferNew, 0, 2);
     let partsBytesNewView = new Uint8Array(mashupBufferNew, 8, partsBytesNew.byteLength);
-    let otherBytesNewView = new Uint8Array(mashupBufferNew, 1 + 8 + otherBytesView.byteLength);
+    let otherBytesNewView = new Uint8Array(mashupBufferNew, 1 + 8 + partsBytesNew.byteLength, otherBytesView.length);
 
     // Copy bytes to account for any change in the length.
     headerNewView[0] = 0;
     headerNewView[1] = partsBytesNew.byteLength;
-    for (let i = 0; i < partsBytesNew.byteLength; i++) {
-        partsBytesNewView[i] = partsBytesNew[i];
-    }
-    for (let i = 0; i < otherBytesNewView.byteLength; i++) {
-        otherBytesNewView[i] = otherBytesNewView[i];
-    }
+    partsBytesNewView.set(partsBytesNew);
+    otherBytesNewView.set(otherBytesView);
 
     // Replace Mashup bytes.
     pbitZip.remove("DataMashup");
