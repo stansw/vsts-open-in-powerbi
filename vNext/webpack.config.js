@@ -12,7 +12,6 @@ module.exports = {
         libraryTarget: "amd",
         path: path.resolve(__dirname, 'out')
     },
-    devtool: "source-map",
     externals: [
         /^VSS\/.*/, 
         /^TFS\/.*/, 
