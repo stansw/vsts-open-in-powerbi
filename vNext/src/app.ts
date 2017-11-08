@@ -116,18 +116,19 @@ export async function mainAsync() {
 
         // Diagnostics data.
         let traceData = {
-            account: context.account.name,
-            collection: context.collection.name,
-            project: context.project.name,
-            team: context.team.name,
+            collectionId: context.collection.id,
+            projectId: context.project.id,
+            teamId: context.team.id,
             contribution: configuration.contribution,
             queryId: query.id,
             queryMode: queryMode,
             queryType: queryType
         };
 
-        // Enable new functionality only for 6% of users
-        let browserCompressionEnabled = context.user.id[0] === "7";
+        // Enable new functionality only for 18% of users
+        let browserCompressionEnabled = context.user.id[0] === "7"
+            || context.user.id[0] === "2"
+            || context.user.id[0] === "9";
 
         if (browserCompressionEnabled && "ArrayBuffer" in window) {
             let scenario = "DownloadQueryFromExtension";
