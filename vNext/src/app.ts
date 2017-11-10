@@ -125,12 +125,7 @@ export async function mainAsync() {
             queryType: queryType
         };
 
-        // Enable new functionality only for 18% of users
-        let browserCompressionEnabled = context.user.id[0] === "7"
-            || context.user.id[0] === "2"
-            || context.user.id[0] === "9";
-
-        if (browserCompressionEnabled && "ArrayBuffer" in window) {
+        if ("ArrayBuffer" in window) {
             let scenario = "DownloadQueryFromExtension";
             try {
                 AppInsights.startTrackEvent(scenario);

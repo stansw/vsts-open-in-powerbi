@@ -6,6 +6,7 @@ namespace SupportedActions {
 }
 
 namespace WellKnownQueries {
+    export const Empty = "00000000-0000-0000-0000-000000000000";
     export const AssignedToMe = "A2108D31-086C-4FB0-AFDA-097E4CC46DF4";
     export const UnsavedWorkItems = "B7A26A56-EA87-4C97-A504-3F028808BB9F";
     export const FollowedWorkItems = "202230E0-821E-401D-96D1-24A7202330D0";
@@ -16,6 +17,7 @@ namespace WellKnownQueries {
 }
 
 let queryExclusionList = [
+    WellKnownQueries.Empty,
     WellKnownQueries.AssignedToMe,
     WellKnownQueries.UnsavedWorkItems,
     WellKnownQueries.FollowedWorkItems,
