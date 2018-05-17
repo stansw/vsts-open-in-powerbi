@@ -1,5 +1,5 @@
 let
-    Referer = "vsts-open-in-powerbi/2.0.0",
+    Referer = "vsts-open-in-powerbi/2.0.4",
     
     BatchSize = 200,
     MaxFieldsCount = 100,
@@ -151,9 +151,9 @@ let
             
             #"Format field definitions path" = FormatCollectionPath(scope) & "/_apis/wit/fields?api-version=1.0",
             #"Get field definitions" = Json.Document(WiqlContents(contents, [RelativePath = #"Format field definitions path"])),
-            #"Convert field definitions to table" = Table.FromRecords(#"Get field definitions"[value]),
+            #"Convert field definitions to table" = Table.FromRecords(#"Get field definitions"[value], { "name", "referenceName", "type" }),
             #"Select relevant fields" = Table.SelectRows(#"Convert field definitions to table", each List.Contains(fields, [referenceName])),
-            #"Add addMashupType" = Table.AddColumn(#"Select relevant fields", "mashupType", each Record.Field(MashupTypeMap, [type])),
+            #"Add addMashupType" = Table.AddColumn(#"Select relevant fields", "mashupType", each Record.FieldOrDefault(MashupTypeMap, [type], type any)),
 
             #"Convert fields to table" = Table.FromList(List.Transform(#"Get field records", each [fields]), Splitter.SplitByNothing(), { "Records" }, null, ExtraValues.Error),
             #"Expand fields records" = Table.ExpandRecordColumn(#"Convert fields to table", "Records", fields, fields),
