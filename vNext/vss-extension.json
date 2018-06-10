@@ -4,7 +4,7 @@
     "version": "0.1.54",
     "name": "Open in Power BI (Dev)",
     "public": false,
-    "baseUri": "https://localhost:8081/",
+    "baseUri": "https://localhost:8080/",
     "scopes": [
         "vso.work"
     ],
