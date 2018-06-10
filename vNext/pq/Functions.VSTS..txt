@@ -1,8 +1,11 @@
 let
-    Referer = "vsts-open-in-powerbi/2.0.4",
+    Referer = "vsts-open-in-powerbi/2.0.5",
     
     BatchSize = 200,
-    MaxFieldsCount = 100,
+
+    // Max URL length set empirically to 3000 minus 200 for the base address.
+    MaxUrlLength = 3000 - 200,
+
     MashupTypeMap = [
         boolean = type logical,
         dateTime = type datetime,
@@ -113,11 +116,19 @@ let
         ) 
         as list => 
         let
-            fieldsQueryString = if (fields <> null and List.Count(fields) <= MaxFieldsCount) 
+            relativePath = FormatCollectionPath(scope) & "/_apis/wit/workitems",
+
+            // Calculate the worst-case length of a url.
+            maxIdsLength = List.Max(List.Transform(ids, each Text.Length(Number.ToText(_)))),
+            worstcaseIdsQueryLength = 5 + /* &ids= */ + BatchSize * (3 /* %2C */ + maxIdsLength),
+            worstcaseFieldsQueryLength = Text.Length("&fields=" & Text.Combine(fields, "%C2")),
+            worstcaseUrlLength = Text.Length(relativePath) + 16 /* ?api-version=1.0 */ + worstcaseIdsQueryLength + worstcaseFieldsQueryLength,
+
+            fieldsQueryString = if (fields <> null and worstcaseUrlLength <= MaxUrlLength) 
                 then "&fields=" & Text.Combine(fields, ",")
                 else "",
-            fieldDefinitionPath = FormatCollectionPath(scope) 
-                & "/_apis/wit/workitems?api-version=1.0" 
+            fieldDefinitionPath = relativePath
+                & "?api-version=1.0" 
                 & fieldsQueryString,
             workItemIdsBatches = Batch(ids, BatchSize),
             workItemIdsBatchQueryStrings = List.Transform(workItemIdsBatches,
