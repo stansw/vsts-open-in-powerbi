@@ -115,6 +115,7 @@ export async function mainAsync() {
         let success = false;
 
         // Diagnostics data.
+        let scenario = "DownloadQueryFromExtension";
         let traceData = {
             collectionId: context.collection.id,
             projectId: context.project.id,
@@ -125,57 +126,34 @@ export async function mainAsync() {
             queryType: queryType
         };
 
-        if ("ArrayBuffer" in window) {
-            let scenario = "DownloadQueryFromExtension";
-            try {
-                AppInsights.startTrackEvent(scenario);
+        try {
+            AppInsights.startTrackEvent(scenario);
 
-                let transform = (section) => {
-                    let replacements = {
-                        // Do not include trailing forward slash in the URL.
-                        '    url = "[^"]*",': `    url = "${context.host.uri.replace(/\/$/, "")}",`,
-                        // Define replacements for all parameters.
-                        '    collection = "[^"]*",': `    collection = "${hosted ? "" : context.collection.name}",`,
-                        '    project = "[^"]*",': `    project = "${context.project.name}",`,
-                        '    team = "[^"]*",': `    team = "${context.team.name}",`,
-                        '    id = "[^"]*",': `    id = "${configuration.queryId}",`
-                    };
-                    for (let pattern in replacements) {
-                        section = section.replace(new RegExp(pattern), replacements[pattern]);
-                    }
-                    return section;
+            let transform = (section) => {
+                let replacements = {
+                    // Do not include trailing forward slash in the URL.
+                    '    url = "[^"]*",': `    url = "${context.host.uri.replace(/\/$/, "")}",`,
+                    // Define replacements for all parameters.
+                    '    collection = "[^"]*",': `    collection = "${hosted ? "" : context.collection.name}",`,
+                    '    project = "[^"]*",': `    project = "${context.project.name}",`,
+                    '    team = "[^"]*",': `    team = "${context.team.name}",`,
+                    '    id = "[^"]*",': `    id = "${configuration.queryId}",`
                 };
+                for (let pattern in replacements) {
+                    section = section.replace(new RegExp(pattern), replacements[pattern]);
+                }
+                return section;
+            };
 
-                let deployment = hosted ? "VSTS" : "TFS";
-                let templateBytes = await ajaxBlobAsync(`templates/${queryType}.${queryMode}.${deployment}.pbit`);
-                let updatedBytes = await transformDataMashupAsync(templateBytes, transform);
-                fileSaver.saveAs(updatedBytes, `${query.name}.pbit`);
-                success = true;
-            } catch (exception) {
-                AppInsights.trackException(exception, null, traceData);
-            } finally {
-                AppInsights.stopTrackEvent(scenario, traceData);
-            }
-        }
-
-        // If browser compression failed then fallback to old approach.
-        if (!success) {
-            let scenario = "DownloadQueryFromService";
-            AppInsights.trackEvent(scenario, {
-                mode: queryMode,
-                type: queryType,
-                contribution: configuration.contribution
-            });
-            let url = TemplateUrl
-                + queryType
-                + "?" + $.param({
-                    url: context.host.uri,
-                    project: context.project.name,
-                    qid: configuration.queryId,
-                    qname: query.name
-                });
-            let navigationService = await VSS.getService<HostNavigationService>(VSS.ServiceIds.Navigation);
-            navigationService.navigate(url);
+            let deployment = hosted ? "VSTS" : "TFS";
+            let templateBytes = await ajaxBlobAsync(`templates/${queryType}.${queryMode}.${deployment}.pbit`);
+            let updatedBytes = await transformDataMashupAsync(templateBytes, transform);
+            fileSaver.saveAs(updatedBytes, `${query.name}.pbit`);
+            success = true;
+        } catch (exception) {
+            AppInsights.trackException(exception, null, traceData);
+        } finally {
+            AppInsights.stopTrackEvent(scenario, traceData);
         }
     } catch (exception) {
         AppInsights.trackException(exception);

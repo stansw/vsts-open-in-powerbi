@@ -53,34 +53,44 @@ async function openQuery(queryId: string, contribution: string) {
     let extensionContext = VSS.getExtensionContext();
     let dialog: IExternalDialog;
 
-    let configuration = <IConfiguration>{
-        queryId: queryId,
-        contribution: contribution,
-        close: () => dialog.close()
-    };
+    if ("ArrayBuffer" in window) {
+        let configuration = <IConfiguration>{
+            queryId: queryId,
+            contribution: contribution,
+            close: () => dialog.close()
+        };
 
-    let hostDialogService = await VSS.getService<IHostDialogService>(VSS.ServiceIds.Dialog);
-    dialog = await hostDialogService.openDialog(
-        `${extensionContext.publisherId}.${extensionContext.extensionId}.notificationDialog`,
-        {
-            title: "Downloading Power BI file...",
-            width: 400,
-            height: 715,
-            modal: true,
-            draggable: false,
-            resizable: false,
-            buttons: {
-                "ok": {
-                    id: "ok",
-                    text: "Dismiss",
-                    click: () => {
-                        dialog.close();
-                    },
-                    class: "cta",
+        let hostDialogService = await VSS.getService<IHostDialogService>(VSS.ServiceIds.Dialog);
+        dialog = await hostDialogService.openDialog(
+            `${extensionContext.publisherId}.${extensionContext.extensionId}.notificationDialog`,
+            {
+                title: "Downloading Power BI file...",
+                width: 400,
+                height: 715,
+                modal: true,
+                draggable: false,
+                resizable: false,
+                buttons: {
+                    "ok": {
+                        id: "ok",
+                        text: "Dismiss",
+                        click: () => {
+                            dialog.close();
+                        },
+                        class: "cta",
+                    }
                 }
-            }
-        },
-        configuration);
+            },
+            configuration);
+    } else {
+        let hostDialogService = await VSS.getService<IHostDialogService>(VSS.ServiceIds.Dialog);
+        hostDialogService.openMessageDialog(
+            "Your browser is not compatible with this extension. Please update your browser.",
+            {
+                title: "Unable to perform this operation",
+                buttons: [hostDialogService.buttons.ok]
+            });
+    }
 }
 
 export let openQueryAction = {
