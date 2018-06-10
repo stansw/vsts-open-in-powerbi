@@ -35,7 +35,7 @@ let
     /// </summary>
     ContentsWithErrorUnwrapping = (contents as function, optional options as record) as binary =>
         let
-            #"Get system status codes" = { 400, 429, 500, 503, 203 },
+            #"Get system status codes" = { 400, 404, 429, 500, 503, 203 },
 
             #"Get options" = if options <> null then options else [],
             #"Get relative path" = Record.FieldOrDefault(#"Get options", "RelativePath", ""),
@@ -51,11 +51,15 @@ let
             #"Get error" = try Json.Document(#"Buffer contents")
                 otherwise try [message = Text.FromBinary(#"Buffer contents")] 
                 otherwise [],
+            #"Get error message" = Record.FieldOrDefault(#"Get error", "message", ""),
+            #"Get not-empty error message" = if Text.Length(#"Get error message") = 0 
+                then "Failed to get contents from relative path '" & #"Get relative path" & "' (" & Number.ToText(#"Get status code") & ")" 
+                else #"Get error message",
+            #"Get final error message" = if #"Get status code" = 203
+                then "The credentials provided are invalid. Please update the credential type by triggering a refresh or in the Data Source Settings dialog."
+                else #"Get not-empty error message",
             #"Get result" = if List.Contains(#"Get handled status codes", #"Get status code")
-                    then error Error.Record("Error",
-                        if #"Get status code" <> 203
-                            then Record.FieldOrDefault(#"Get error", "message", "Failed to get contents from relative path'" & #"Get relative path" & "' (" & Number.ToText(#"Get status code") & ")" )
-                            else "The credentials provided are invalid. Please update the credential type through a refresh or in the Data Source Settings dialog to continue.",
+                    then error Error.Record("Error", #"Get final error message",
                     [
                         DataSourceKind = "Web.Contents", 
                         ActivityId = Diagnostics.ActivityId(),
