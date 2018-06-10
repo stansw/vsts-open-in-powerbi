@@ -5,8 +5,8 @@ let
     team = "vsts-open-in-powerbi Team",
     id = "d5349265-9c9d-4808-933a-c3d27b731657",
 
-    // Create wrapper for VSTS.Contents function as a workaround for the static code analysis in Power BI Service.
-    contents = (o) => VSTS.Contents(
+    // Create wrapper for VSTS.AccountContents function as a workaround for the static code analysis in Power BI Service.
+    contents = (o) => VSTS.AccountContents(
         url, 
         [ 
             Version              = Record.FieldOrDefault(Record.FieldOrDefault(o, "Headers", []), "Referer", ""),

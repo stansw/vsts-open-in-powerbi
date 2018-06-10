@@ -1,5 +1,5 @@
 let
-    Referer = "vsts-open-in-powerbi/2.0.5",
+    Referer = "vsts-open-in-powerbi/2.1.0",
     
     BatchSize = 200,
 
