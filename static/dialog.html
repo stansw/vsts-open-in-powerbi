@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Open in Power BI</title>
+    <script src="../lib/VSS.SDK.min.js"></script>
+</head>
+
+<body>
+    <script type="text/javascript">
+        // Initialize the VSS sdk.
+        VSS.init({
+            explicitNotifyLoaded: true,
+            usePlatformScripts: true,
+            usePlatformStyles: true,
+            moduleLoaderConfig: {
+                paths: {
+                    "jszip": "lib/jszip.min",
+                }
+            }
+        });
+
+        // Wait for the SDK to be initialized and load the extension.
+        VSS.ready(function () {
+            VSS.require(["out/app.bundle"], function (app) {
+                // Loading succeeded.
+                VSS.notifyLoadSucceeded();
+                app.mainAsync();
+            });
+        });
+    </script>
+
+    <div id="content">
+        <div>Thanks for using <a href="https://github.com/stansw/vsts-open-in-powerbi">Open Work Items in Power BI</a> extension.</div>
+        <div>For feedback and support please refer to the <a href="https://github.com/stansw/vsts-open-in-powerbi/wiki/Support">project website</a>.</div>
+        <div style="margin-top: 10px;">This extension requires <a href="http://powerbi.microsoft.com/desktop?WT.mc_id=VSTS_OpenInPowerBI">Microsoft Power BI Desktop</a> October 2017 (or later) to be installed locally to open template files (*.pbit).</div>
+        <div style="margin-top: 10px;">Your file will be available for download.</div>
+        <img style="margin-top: 10px;margin-bottom: 10px;" src="images/open_guide_350x467.png" />
+        <div id="countdown-message">This dialog will close in <span id="countdown"></span> seconds... <a id="countdown-cancel">cancel</a></div>
+    </div>
+</body>
+
+</html>
