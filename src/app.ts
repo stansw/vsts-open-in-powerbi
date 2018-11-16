@@ -130,9 +130,12 @@ export async function mainAsync() {
             AppInsights.startTrackEvent(scenario);
 
             let transform = (section) => {
+                let url = context.host.uri
+                    .replace(/dev\.azure\.com\/([^\/]*)/, (match, account) => `${account}.visualstudio.com`)
+                    .replace(/\/$/, "");
                 let replacements = {
                     // Do not include trailing forward slash in the URL.
-                    '    url = "[^"]*",': `    url = "${context.host.uri.replace(/\/$/, "")}",`,
+                    '    url = "[^"]*",': `    url = "${url}",`,
                     // Define replacements for all parameters.
                     '    collection = "[^"]*",': `    collection = "${hosted ? "" : context.collection.name}",`,
                     '    project = "[^"]*",': `    project = "${context.project.name}",`,

@@ -4,7 +4,6 @@
     "version": "0.1.54",
     "name": "Open in Power BI (Dev)",
     "public": false,
-    "baseUri": "https://localhost:8080/",
     "scopes": [
         "vso.work"
     ],
@@ -15,7 +14,7 @@
     },
     "targets": [
         {
-            "id": "Microsoft.VisualStudio.Services.Cloud"
+            "id": "Microsoft.VisualStudio.Services"
         }
     ],
     "tags": [
@@ -25,14 +24,14 @@
         "Agile",
         "Query"
     ],
-  "content": {
-    "license": {
-      "path": "license.md"
-    },
+    "content": {
+        "license": {
+            "path": "license.md"
+        },
         "details": {
             "path": "details.md"
         }
-  },
+    },
     "links": {
         "learn": {
             "uri": "https://github.com/stansw/vsts-open-in-powerbi/wiki"
@@ -49,28 +48,27 @@
         "color": "rgb(237, 189, 17)",
         "theme": "light"
     },
-  "files": [
-    {
-      "path": "out",
-      "addressable": true
-    },
-    {
-      "path": "static",
-      "addressable": true
-    },
-    {
-      "path": "node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js",
-      "addressable": true,
-      "packagePath": "lib/VSS.SDK.min.js"
-    }
-    ,{
-      "path": "node_modules/jszip/dist/jszip.min.js",
-      "addressable": true,
-      "packagePath": "lib/jszip.min.js"
-    }
- 
-  ],
-  "categories": [
+    "files": [
+        {
+            "path": "out",
+            "addressable": true
+        },
+        {
+            "path": "static",
+            "addressable": true
+        },
+        {
+            "path": "node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js",
+            "addressable": true,
+            "packagePath": "lib/VSS.SDK.min.js"
+        },
+        {
+            "path": "node_modules/jszip/dist/jszip.min.js",
+            "addressable": true,
+            "packagePath": "lib/jszip.min.js"
+        }
+    ],
+    "categories": [
         "Plan and track"
     ],
     "contributions": [
